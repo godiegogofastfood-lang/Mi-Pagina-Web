@@ -1,0 +1,11 @@
+# Static site: a single self-contained HTML page (Tailwind and fonts load from CDNs).
+# No framework, package manager, or build step is needed.
+[build]
+  publish = "."
+  command = ""
+
+# The page isn't named index.html, so serve it at the site root.
+[[redirects]]
+  from = "/"
+  to = "/godiegogo_fast_food_sitio_web_oficial_y_panel_editable.html"
+  status = 200
