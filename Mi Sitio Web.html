@@ -1,0 +1,2695 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoDiegoGo Fast Food | Comida Rápida con Sabor y Descuento Aplicado</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              red: '#E63946',
+              orange: '#F77F00',
+              gold: '#FCBF49',
+              cream: '#FFFDF9',
+              dark: '#1D1E2C',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #FFFDF9;
+      color: #1D1E2C;
+    }
+    .glass-nav {
+      background: rgba(255, 253, 249, 0.92);
+      backdrop-filter: blur(12px);
+    }
+    .card-hover {
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 28px -8px rgba(29, 30, 44, 0.12);
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #f3f4f6;
+      border-radius: 9999px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 9999px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-brand-gold selection:text-brand-dark">
+
+  <!-- Toast / Notificación flotante -->
+  <div id="toast-container" class="fixed top-20 right-4 z-[90] flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Barra de Modo Editor Activo -->
+  <div id="editor-banner" class="hidden bg-brand-dark text-white text-xs sm:text-sm py-2.5 px-4 sticky top-0 z-[70] border-b border-amber-400/30 shadow-lg">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+        <span class="font-semibold text-amber-300">Modo Editor Activo:</span>
+        <span class="text-gray-200 hidden sm:inline">Edita textos, logo, menú, cuentas bancarias y seguridad en tiempo real.</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="openAdminModal('general')" class="bg-brand-orange hover:bg-orange-600 text-white font-semibold px-3 py-1.5 rounded-lg transition text-xs cursor-pointer">
+          ⚙️ Panel Completo
+        </button>
+        <button onclick="exportUpdatedHTML()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-1.5 rounded-lg transition text-xs cursor-pointer" title="Descarga el index.html con tus cambios listos para subir a GitHub">
+          ⬇️ Descargar index.html para GitHub
+        </button>
+        <button onclick="toggleEditMode(false)" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg transition text-xs cursor-pointer">
+          Salir Editor
+        </button>
+        <button onclick="logoutAdmin()" class="bg-red-600/80 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition text-xs font-semibold cursor-pointer">
+          🔒 Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navegación Principal -->
+  <header class="glass-nav sticky top-0 z-50 border-b border-orange-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20 gap-3">
+        <!-- Logo y Nombre (5 clics seguidos activan el acceso secreto de administrador) -->
+        <a href="#inicio" id="secret-logo-trigger" onclick="handleSecretLogoClick(event)" class="flex items-center gap-3 group select-none">
+          <div id="nav-logo-box" class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-brand-red to-brand-orange flex items-center justify-center text-white text-2xl shadow-md group-hover:scale-105 transition overflow-hidden shrink-0">
+            <span id="nav-logo-emoji">🍔</span>
+            <img id="nav-logo-img" src="" alt="Logo del negocio" class="w-full h-full object-cover hidden" />
+          </div>
+          <div>
+            <h1 id="nav-business-name" class="text-lg sm:text-xl font-extrabold tracking-tight text-brand-dark leading-none">
+              GoDiegoGo Fast Food
+            </h1>
+            <p id="nav-business-tagline" class="text-xs text-gray-500 font-medium mt-0.5">
+              Rápido, caliente y con bebida gratis
+            </p>
+          </div>
+        </a>
+
+        <!-- Enlaces Desktop -->
+        <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-700">
+          <a href="#menu" class="hover:text-brand-red transition">Menú</a>
+          <a href="#delivery" class="hover:text-brand-red transition">Horarios y Delivery</a>
+          <a href="#pagos" class="hover:text-brand-red transition">Pagos y Comprobante</a>
+          <a href="#secciones-extra" class="hover:text-brand-red transition">Nosotros</a>
+        </nav>
+
+        <!-- Estado Abierto/Cerrado + Carrito -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div id="store-status-badge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+            <span id="store-status-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span id="store-status-text">Verificando...</span>
+          </div>
+
+          <button onclick="toggleCart(true)" class="relative bg-brand-red hover:bg-red-700 text-white px-3.5 sm:px-4 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-md shadow-red-500/20 transition cursor-pointer">
+            <span>🛒</span>
+            <span class="hidden sm:inline">Mi Pedido</span>
+            <span id="cart-count-badge" class="bg-brand-gold text-brand-dark text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sección Hero -->
+  <section id="inicio" class="relative overflow-hidden pt-8 pb-14 sm:pt-14 sm:pb-20 bg-gradient-to-b from-orange-50/90 via-amber-50/40 to-brand-cream">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <div class="lg:col-span-7 space-y-6">
+          <div class="inline-flex flex-wrap items-center gap-2 bg-white border border-orange-200 rounded-full px-4 py-1.5 shadow-sm">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-brand-red">✨ Descuento aplicado en todo el menú</span>
+            <span class="text-gray-300">•</span>
+            <span class="text-xs font-semibold text-gray-600">🥤 Refrescos gratis incluidos en platos</span>
+          </div>
+
+          <h2 id="hero-title" class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-brand-dark tracking-tight leading-[1.12]">
+            El sabor rápido que te encanta en <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-brand-orange">GoDiegoGo Fast Food</span>
+          </h2>
+
+          <p id="hero-description" class="text-base sm:text-lg text-gray-600 max-w-2xl leading-relaxed">
+            Desayunos, almuerzos y cenas recién preparados. Todos nuestros combos de desayuno y cena incluyen <strong>1 refresco gratis</strong> y nuestros almuerzos incluyen <strong>2 bebidas gratis</strong>.
+          </p>
+
+          <!-- Aviso Destacado Método de Pago -->
+          <div class="bg-amber-100/90 border-l-4 border-brand-orange rounded-r-2xl p-4 max-w-xl shadow-sm">
+            <div class="flex items-start gap-3">
+              <span class="text-xl">🏦</span>
+              <div>
+                <p id="hero-payment-notice" class="text-sm font-extrabold text-brand-dark uppercase tracking-wide">
+                  SOLO PAGOS POR TRANSFERENCIA BANCARIA
+                </p>
+                <p class="text-xs sm:text-sm text-gray-700 mt-0.5">
+                  Aceptamos transferencias a <strong>Banco de Reservas</strong> y <strong>Banco BHD</strong>. Sube tu comprobante al confirmar tu pedido.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <a href="#menu" class="bg-gradient-to-r from-brand-red to-brand-orange hover:opacity-95 text-white font-bold px-6 py-3.5 rounded-2xl shadow-lg shadow-orange-500/25 transition text-sm sm:text-base">
+              🍽️ Ver Menú y Pedir Ahora
+            </a>
+            <button onclick="openChatbot()" class="bg-white hover:bg-gray-50 text-brand-dark border-2 border-gray-200 font-bold px-6 py-3.5 rounded-2xl transition text-sm sm:text-base flex items-center gap-2 cursor-pointer">
+              <span>🤖</span> Hablar con Asistente Virtual
+            </button>
+          </div>
+
+          <!-- Sabores disponibles para bebidas gratis -->
+          <div id="hero-soda-flavors" class="flex flex-wrap items-center gap-2 pt-1"></div>
+        </div>
+
+        <!-- Tarjeta Resumen Rápido -->
+        <div class="lg:col-span-5">
+          <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-orange-100 space-y-5 relative">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-brand-orange">Información Oficial</span>
+                <h3 class="text-xl font-extrabold text-brand-dark">Horario &amp; Entregas</h3>
+              </div>
+              <span class="text-3xl">🛵</span>
+            </div>
+
+            <div class="space-y-3 text-sm">
+              <div class="flex items-center justify-between p-3 rounded-2xl bg-orange-50/70">
+                <span class="font-semibold text-gray-700">⏰ Lunes a Sábado</span>
+                <span id="card-hours-weekdays" class="font-extrabold text-brand-dark">8:30 AM – 10:00 PM</span>
+              </div>
+              <div class="flex items-center justify-between p-3 rounded-2xl bg-red-50/70">
+                <span class="font-semibold text-gray-700">🚫 Domingos</span>
+                <span id="card-hours-sunday" class="font-extrabold text-brand-red">Cerrado todo el día</span>
+              </div>
+              <div class="flex items-center justify-between p-3 rounded-2xl bg-emerald-50/70">
+                <span class="font-semibold text-gray-700">🏪 Recogida en local</span>
+                <span class="font-extrabold text-emerald-700">GRATIS (RD$ 0)</span>
+              </div>
+              <div class="p-3 rounded-2xl bg-amber-50/80 space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="font-semibold text-gray-700">🛵 Delivery (8:30 AM – 6:00 PM)</span>
+                  <span id="card-delivery-day" class="font-extrabold text-brand-dark">RD$ 50</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="font-semibold text-gray-700">🌙 Delivery (6:00 PM – 10:00 PM)</span>
+                  <span id="card-delivery-night" class="font-extrabold text-brand-dark">RD$ 75</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección Menú Interactivo -->
+  <section id="menu" class="py-14 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div>
+        <span class="text-xs font-extrabold uppercase tracking-widest text-brand-orange">Catálogo Oficial • Precios en DOP</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-dark mt-1">Nuestro Menú</h2>
+        <p class="text-sm sm:text-base text-gray-600 mt-1">
+          Todos los productos tienen <strong>descuento aplicado</strong>. Selecciona tus platos y elige los sabores de tus refrescos incluidos.
+        </p>
+      </div>
+
+      <!-- Buscador -->
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="relative flex-1 sm:w-64">
+          <input
+            type="text"
+            id="menu-search"
+            oninput="renderMenu()"
+            placeholder="Buscar empanadas, yaroa, mofongo..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange"
+          />
+          <span class="absolute left-3.5 top-2.5 text-gray-400">🔍</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pestañas de Categorías -->
+    <div id="category-tabs" class="flex flex-wrap gap-2 mb-8"></div>
+
+    <!-- Contenedor de Categorías y Productos -->
+    <div id="menu-container" class="space-y-12"></div>
+  </section>
+
+  <!-- Sección Horarios y Tarifas de Delivery -->
+  <section id="delivery" class="py-14 bg-orange-50/60 border-y border-orange-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <span class="text-xs font-extrabold uppercase tracking-widest text-brand-red">Entrega Rápida o Recogida</span>
+        <h2 class="text-3xl font-extrabold text-brand-dark mt-1">Horarios y Delivery</h2>
+        <p class="text-sm sm:text-base text-gray-600 mt-2">
+          El costo de envío a domicilio se ajusta automáticamente según la hora del pedido, o puedes recoger gratis en nuestro local.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-3xl p-6 border border-orange-100 shadow-sm">
+          <div class="w-12 h-12 rounded-2xl bg-amber-100 text-brand-orange flex items-center justify-center text-2xl mb-4">☀️</div>
+          <h3 class="text-lg font-extrabold text-brand-dark">Delivery Diurno</h3>
+          <p class="text-2xl font-extrabold text-brand-red mt-2" id="info-delivery-day-price">RD$ 50</p>
+          <p class="text-sm text-gray-600 mt-1" id="info-delivery-day-hours">De 8:30 AM a 6:00 PM (Lunes a Sábado)</p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 border border-orange-100 shadow-sm">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-2xl mb-4">🌙</div>
+          <h3 class="text-lg font-extrabold text-brand-dark">Delivery Nocturno</h3>
+          <p class="text-2xl font-extrabold text-brand-red mt-2" id="info-delivery-night-price">RD$ 75</p>
+          <p class="text-sm text-gray-600 mt-1" id="info-delivery-night-hours">De 6:00 PM a 10:00 PM (Lunes a Sábado)</p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 border border-orange-100 shadow-sm">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl mb-4">🏪</div>
+          <h3 class="text-lg font-extrabold text-brand-dark">Recogida en el Local</h3>
+          <p class="text-2xl font-extrabold text-emerald-600 mt-2">RD$ 0 (Gratis)</p>
+          <p id="info-pickup-address" class="text-sm text-gray-600 mt-1">Retira tu orden caliente sin costo de envío dentro del horario de atención.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección Exclusiva de Pagos por Transferencia y Envío de Comprobante -->
+  <section id="pagos" class="py-14 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-brand-dark text-white rounded-3xl p-6 sm:p-10 lg:p-12 shadow-2xl relative overflow-hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Columna Cuentas Bancarias -->
+        <div class="lg:col-span-6 space-y-6">
+          <div class="inline-flex items-center gap-2 bg-brand-red text-white text-xs font-extrabold uppercase tracking-wider px-3.5 py-1.5 rounded-full">
+            ⚠️ SOLO PAGOS POR TRANSFERENCIA
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight">
+            Cuentas Bancarias Oficiales para Transferencias
+          </h2>
+          <p id="payment-instructions-text" class="text-gray-300 text-sm sm:text-base leading-relaxed">
+            Para procesar tu pedido en <strong>GoDiegoGo Fast Food</strong>, realiza tu transferencia a cualquiera de nuestras cuentas autorizadas y adjunta el comprobante bancario.
+          </p>
+
+          <div id="bank-accounts-list" class="space-y-4"></div>
+        </div>
+
+        <!-- Columna Formulario Rápido de Confirmación de Comprobante -->
+        <div class="lg:col-span-6 bg-white text-brand-dark rounded-3xl p-6 sm:p-8 shadow-xl">
+          <h3 class="text-xl font-extrabold flex items-center gap-2">
+            <span>🧾</span> Confirmar Pago y Enviar Comprobante
+          </h3>
+          <p class="text-xs sm:text-sm text-gray-500 mt-1 mb-5">
+            Si ya realizaste tu transferencia, completa estos datos para reportar tu comprobante directo a nuestro WhatsApp.
+          </p>
+
+          <form id="standalone-receipt-form" onsubmit="submitStandaloneReceipt(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Tu Nombre *</label>
+                <input type="text" id="sr-name" required placeholder="Ej. María Pérez" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-brand-orange focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Banco Destino *</label>
+                <select id="sr-bank" required class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:ring-2 focus:ring-brand-orange focus:outline-none"></select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Monto Transferido (RD$) *</label>
+                <input type="number" id="sr-amount" required min="1" placeholder="Ej. 200" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-brand-orange focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">No. de Referencia / Comprobante *</label>
+                <input type="text" id="sr-ref" required placeholder="Ej. 84739201" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-brand-orange focus:outline-none" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Adjuntar Captura o PDF del Comprobante *</label>
+              <input type="file" id="sr-file" accept="image/*,.pdf" required onchange="previewStandaloneFile(event)" class="w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-orange-100 file:text-brand-orange hover:file:bg-orange-200 cursor-pointer border border-dashed border-gray-300 rounded-xl p-2" />
+              <div id="sr-preview-box" class="hidden mt-3 p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 overflow-hidden">
+                  <img id="sr-preview-img" src="" alt="Vista previa comprobante" class="w-12 h-12 object-cover rounded-lg border hidden" />
+                  <span id="sr-preview-icon" class="text-2xl">📄</span>
+                  <div class="truncate">
+                    <p id="sr-preview-name" class="text-xs font-bold text-gray-800 truncate"></p>
+                    <p class="text-[11px] text-emerald-600 font-semibold">Comprobante listo para enviar</p>
+                  </div>
+                </div>
+                <button type="button" onclick="clearStandaloneFile()" class="text-xs text-red-600 font-bold hover:underline cursor-pointer">Quitar</button>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-2xl shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2 text-sm cursor-pointer">
+              <span>📲</span> Confirmar y Enviar Comprobante por WhatsApp
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Secciones Personalizables Extra -->
+  <section id="secciones-extra" class="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <span class="text-xs font-extrabold uppercase tracking-widest text-brand-orange">Información Adicional</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-brand-dark">Más sobre GoDiegoGo Fast Food</h2>
+      </div>
+    </div>
+    <div id="custom-sections-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-brand-dark text-gray-300 pt-12 pb-24 sm:pb-12 mt-12 border-t border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-gray-800">
+        <div>
+          <div class="flex items-center gap-2.5 text-white font-extrabold text-xl">
+            <span id="footer-logo-emoji">🍔</span>
+            <img id="footer-logo-img" src="" alt="Logo pie de página" class="w-7 h-7 rounded-lg object-cover hidden" />
+            <span id="footer-business-name">GoDiegoGo Fast Food</span>
+          </div>
+          <p id="footer-description" class="text-sm text-gray-400 mt-3 leading-relaxed">
+            Comida rápida fresca, deliciosa y con refrescos gratis incluidos. Atención personalizada por WhatsApp y transferencia bancaria segura.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-3">Contacto y Pedidos</h4>
+          <ul class="space-y-2 text-sm">
+            <li>📲 WhatsApp Oficial: <a id="footer-whatsapp-link" href="https://wa.me/18297160430" target="_blank" class="text-brand-gold font-bold hover:underline">18297160430</a></li>
+            <li>⏰ Lunes a Sábado: <span id="footer-hours">8:30 AM a 10:00 PM</span></li>
+            <li>🚫 Domingos: Cerrado todo el día</li>
+            <li>🏦 Pago: <strong>Solo transferencia bancaria</strong></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-3">Atención y Entregas</h4>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li>🛵 Delivery Diurno (8:30 AM – 6:00 PM): RD$ 50</li>
+            <li>🌙 Delivery Nocturno (6:00 PM – 10:00 PM): RD$ 75</li>
+            <li>🏪 Recogida en el local: Gratis (RD$ 0)</li>
+            <li>✨ Todos nuestros productos tienen descuento aplicado</li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-6 text-center text-xs text-gray-500">
+        © <span id="current-year"></span> <span id="footer-copy-name">GoDiegoGo Fast Food</span>. Todos los derechos reservados.
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL: Selección de Sabores de Refresco Gratis al Añadir Plato -->
+  <div id="soda-modal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-5">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-brand-orange">🥤 Bebida Gratis Incluida</span>
+          <h3 id="soda-modal-item-name" class="text-xl font-extrabold text-brand-dark mt-0.5">Nombre del Plato</h3>
+          <p id="soda-modal-subtitle" class="text-xs text-gray-500 mt-1">Elige el sabor de tu refresco gratis incluido:</p>
+        </div>
+        <button onclick="closeSodaModal()" class="text-gray-400 hover:text-gray-700 text-xl font-bold p-1 cursor-pointer">✕</button>
+      </div>
+
+      <div id="soda-selectors-container" class="space-y-4"></div>
+
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+        <button onclick="closeSodaModal()" class="px-4 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition cursor-pointer">
+          Cancelar
+        </button>
+        <button onclick="confirmAddWithSodas()" class="bg-brand-red hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-sm font-extrabold shadow-md transition cursor-pointer">
+          Agregar al Pedido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRAWER LATERAL: Carrito de Compras y Checkout -->
+  <div id="cart-drawer" class="fixed inset-0 z-[75] hidden justify-end bg-black/50 backdrop-blur-xs">
+    <div class="bg-white w-full max-w-lg h-full flex flex-col shadow-2xl">
+      <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-brand-cream">
+        <div>
+          <h3 class="text-lg font-extrabold text-brand-dark flex items-center gap-2">
+            <span>🛒</span> Tu Pedido — GoDiegoGo
+          </h3>
+          <p class="text-xs text-emerald-700 font-bold">✨ Descuento aplicado en todos los productos</p>
+        </div>
+        <button onclick="toggleCart(false)" class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-700 cursor-pointer">✕</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto custom-scroll p-5 space-y-6">
+        <div id="cart-items-list" class="space-y-3"></div>
+
+        <div id="checkout-section" class="hidden space-y-5 pt-4 border-t border-gray-200">
+          <h4 class="font-extrabold text-brand-dark text-base">1. Modalidad de Entrega</h4>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button type="button" id="btn-mode-delivery" onclick="setDeliveryMode('delivery')" class="p-3 rounded-2xl border-2 border-brand-orange bg-orange-50 text-left transition cursor-pointer">
+              <div class="font-extrabold text-sm text-brand-dark">🛵 Delivery</div>
+              <div id="label-delivery-fee-dynamic" class="text-xs text-brand-red font-bold mt-0.5">RD$ 50 / RD$ 75</div>
+            </button>
+            <button type="button" id="btn-mode-pickup" onclick="setDeliveryMode('pickup')" class="p-3 rounded-2xl border-2 border-gray-200 bg-white text-left transition cursor-pointer">
+              <div class="font-extrabold text-sm text-brand-dark">🏪 Recoger en Local</div>
+              <div class="text-xs text-emerald-600 font-bold mt-0.5">Gratis (RD$ 0)</div>
+            </button>
+          </div>
+
+          <div id="delivery-details-box" class="space-y-3 bg-orange-50/60 p-4 rounded-2xl border border-orange-100">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Franja Horaria de Delivery</label>
+              <select id="checkout-delivery-slot" onchange="updateCartTotals()" class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold">
+                <option value="day">8:30 AM a 6:00 PM (RD$ 50)</option>
+                <option value="night">6:00 PM a 10:00 PM (RD$ 75)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Dirección exacta y referencias *</label>
+              <textarea id="checkout-address" rows="2" placeholder="Calle, número de casa/edificio, sector y punto de referencia..." class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-xs focus:ring-2 focus:ring-brand-orange focus:outline-none"></textarea>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <h4 class="font-extrabold text-brand-dark text-base">2. Tus Datos</h4>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Nombre Completo *</label>
+              <input type="text" id="checkout-customer-name" placeholder="Escribe tu nombre (ej. María)" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-brand-orange focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="space-y-3 bg-amber-50/90 p-4 rounded-2xl border border-amber-200">
+            <div class="flex items-center justify-between">
+              <h4 class="font-extrabold text-brand-dark text-sm">3. Pago (SOLO TRANSFERENCIA)</h4>
+              <span class="text-[11px] font-extrabold bg-brand-red text-white px-2 py-0.5 rounded-full">Obligatorio</span>
+            </div>
+
+            <div id="checkout-bank-cards" class="space-y-2 text-xs"></div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">¿A cuál banco transferiste? *</label>
+              <select id="checkout-bank-selected" class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold"></select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Número de Referencia del Comprobante *</label>
+              <input type="text" id="checkout-transfer-ref" placeholder="Ej. 90482173" class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-xs focus:ring-2 focus:ring-brand-orange focus:outline-none" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Subir Captura / Comprobante Bancario *</label>
+              <input type="file" id="checkout-receipt-file" accept="image/*,.pdf" onchange="previewCheckoutReceipt(event)" class="w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-orange file:text-white cursor-pointer bg-white border border-dashed border-amber-400 rounded-xl p-1.5" />
+              <div id="checkout-receipt-preview" class="hidden mt-2 flex items-center gap-2 bg-white p-2 rounded-xl border border-amber-200">
+                <img id="checkout-receipt-img" src="" alt="Comprobante" class="w-10 h-10 object-cover rounded hidden" />
+                <span id="checkout-receipt-filename" class="text-xs font-semibold text-emerald-700 truncate flex-1"></span>
+                <button type="button" onclick="clearCheckoutReceipt()" class="text-xs text-red-600 font-bold cursor-pointer">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-2 text-sm">
+            <div class="flex justify-between text-gray-600">
+              <span>Subtotal (<span class="text-emerald-600 font-semibold">descuento aplicado</span>)</span>
+              <span id="cart-subtotal" class="font-bold text-brand-dark">RD$ 0</span>
+            </div>
+            <div class="flex justify-between text-gray-600">
+              <span>Costo de Delivery</span>
+              <span id="cart-delivery-cost" class="font-bold text-brand-dark">RD$ 50</span>
+            </div>
+            <div class="flex justify-between text-base font-extrabold text-brand-dark pt-2 border-t border-gray-200">
+              <span>Total a Transferir</span>
+              <span id="cart-total" class="text-brand-red text-lg">RD$ 0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cart-footer" class="hidden p-4 border-t border-gray-200 bg-white">
+        <button onclick="sendOrderToWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-2xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-2 text-sm cursor-pointer">
+          <span>📲</span> Confirmar Pedido y Enviar por WhatsApp
+        </button>
+        <p class="text-[11px] text-center text-gray-500 mt-2">
+          Al abrirse WhatsApp, recuerda adjuntar la imagen de tu comprobante cargado.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHATBOT FLOTANTE INTEGRADO -->
+  <div class="fixed bottom-4 right-4 z-[65] flex flex-col items-end">
+    <div id="chatbot-window" class="hidden w-[92vw] sm:w-96 bg-white rounded-3xl shadow-2xl border border-orange-200 overflow-hidden mb-3 flex flex-col max-h-[78vh]">
+      <div class="bg-gradient-to-r from-brand-red to-brand-orange text-white p-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl">🤖</div>
+          <div>
+            <h4 class="font-extrabold text-sm leading-tight">Asistente GoDiegoGo</h4>
+            <div class="flex items-center gap-1.5 text-[11px] text-orange-100">
+              <span id="bot-status-dot" class="w-2 h-2 rounded-full bg-emerald-300"></span>
+              <span id="bot-status-label">En línea • Atención al cliente</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1">
+          <button onclick="resetChatbot()" title="Reiniciar chat" class="p-1.5 hover:bg-white/15 rounded-lg text-xs cursor-pointer">🔄</button>
+          <button onclick="toggleChatbot()" title="Cerrar chat" class="p-1.5 hover:bg-white/15 rounded-lg text-sm font-bold cursor-pointer">✕</button>
+        </div>
+      </div>
+
+      <div id="bot-admin-sim-bar" class="hidden bg-amber-50 px-3 py-1.5 border-b border-amber-100 items-center justify-between text-[11px]">
+        <span id="bot-hours-info" class="text-gray-600 font-medium">Modo Prueba Admin:</span>
+        <button id="btn-toggle-sim-open" onclick="toggleSimulateOpen()" class="text-brand-orange font-bold hover:underline cursor-pointer">
+          Simular Abierto
+        </button>
+      </div>
+
+      <div id="chatbot-messages" class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 bg-brand-cream/60 min-h-[260px]"></div>
+
+      <div id="chatbot-quick-replies" class="px-3 py-2 bg-white border-t border-gray-100 flex gap-1.5 overflow-x-auto custom-scroll"></div>
+
+      <form onsubmit="handleChatSubmit(event)" class="p-3 bg-white border-t border-gray-200 flex items-center gap-2">
+        <input
+          type="text"
+          id="chatbot-input"
+          placeholder="Escribe tu nombre o consulta..."
+          class="flex-1 px-3.5 py-2 rounded-xl border border-gray-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange"
+        />
+        <button type="submit" class="bg-brand-red hover:bg-red-700 text-white px-3.5 py-2 rounded-xl font-bold text-sm transition cursor-pointer">
+          ➤
+        </button>
+      </form>
+    </div>
+
+    <button onclick="toggleChatbot()" class="bg-gradient-to-r from-brand-red to-brand-orange hover:scale-105 text-white px-4 py-3.5 rounded-full shadow-xl shadow-orange-500/30 flex items-center gap-2.5 font-extrabold text-sm transition cursor-pointer">
+      <span class="text-xl">💬</span>
+      <span>Asistente GoDiegoGo</span>
+    </button>
+  </div>
+
+  <!-- MODAL PRIVADO DE INICIO DE SESIÓN DE ADMINISTRADOR -->
+  <div id="admin-login-modal" class="fixed inset-0 z-[95] hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-gray-200 space-y-5">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-brand-dark text-brand-gold flex items-center justify-center text-xl shadow">🔐</div>
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-brand-orange">Acceso Restringido</span>
+            <h3 class="text-lg font-extrabold text-brand-dark leading-tight">Administrador del Sitio</h3>
+          </div>
+        </div>
+        <button onclick="closeAdminLoginModal()" class="text-gray-400 hover:text-gray-700 text-lg font-bold p-1 cursor-pointer">✕</button>
+      </div>
+
+      <p class="text-xs text-gray-600 leading-relaxed">
+        Área privada exclusiva para el propietario de <strong>GoDiegoGo Fast Food</strong>. Ingresa tu contraseña para habilitar el editor.
+      </p>
+
+      <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1.5">Contraseña de Administrador</label>
+          <input
+            type="password"
+            id="admin-password-input"
+            required
+            autocomplete="current-password"
+            placeholder="Ingresa tu contraseña privada..."
+            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-orange focus:outline-none"
+          />
+          <p id="admin-login-error" class="hidden text-xs font-bold text-red-600 mt-1.5">Contraseña incorrecta. Inténtalo nuevamente.</p>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-[11px] text-amber-950 space-y-2.5">
+          <p class="leading-relaxed">
+            Por seguridad, ninguna contraseña se muestra en pantalla ni se envía por aplicaciones externas. Solicita una notificación automática al correo registrado sin salir de esta página:
+          </p>
+          <div class="text-[10px] font-semibold text-amber-900">
+            <span id="login-admin-email-hint">✉️ Correo registrado: --</span>
+          </div>
+          <button type="button" id="btn-request-initial-email" onclick="triggerSilentEmailAlert('initial')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-3 rounded-xl text-xs cursor-pointer transition">
+            ✉️ Enviar aviso de acceso al correo registrado
+          </button>
+          <p id="login-email-status-msg" class="hidden text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl p-2 leading-relaxed"></p>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-1">
+          <button type="button" onclick="closeAdminLoginModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 cursor-pointer">
+            Cancelar
+          </button>
+          <button type="submit" class="bg-brand-dark hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl text-xs font-extrabold shadow-md cursor-pointer">
+            Desbloquear Panel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE ADMINISTRACIÓN COMPLETO -->
+  <div id="admin-modal" class="fixed inset-0 z-[85] hidden items-center justify-center bg-black/65 backdrop-blur-sm p-3 sm:p-6">
+    <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="bg-brand-dark text-white p-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 class="text-lg sm:text-xl font-extrabold flex items-center gap-2">
+            <span>✏️</span> Panel Privado de Edición — GoDiegoGo Fast Food
+          </h3>
+          <p class="text-xs text-gray-300 mt-0.5">
+            Edita textos, logo, menú, cuentas bancarias y seguridad, luego descarga index.html para GitHub.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportUpdatedHTML()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl transition cursor-pointer">
+            ⬇️ Descargar index.html
+          </button>
+          <button onclick="logoutAdmin()" class="bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-xl transition cursor-pointer">
+            🔒 Cerrar Sesión
+          </button>
+          <button onclick="closeAdminModal()" class="bg-white/10 hover:bg-white/20 text-white w-9 h-9 rounded-xl font-bold cursor-pointer">✕</button>
+        </div>
+      </div>
+
+      <!-- Navegación Pestañas Admin -->
+      <div class="flex flex-wrap gap-1.5 px-5 pt-3 pb-2 bg-gray-50 border-b border-gray-200 text-xs font-bold">
+        <button onclick="switchAdminTab('general')" id="admin-tab-general" class="admin-tab-btn px-3.5 py-2 rounded-xl bg-brand-orange text-white cursor-pointer">🏪 Negocio, Logo y Horarios</button>
+        <button onclick="switchAdminTab('payments')" id="admin-tab-payments" class="admin-tab-btn px-3.5 py-2 rounded-xl bg-white text-gray-700 hover:bg-gray-100 cursor-pointer">🏦 Cuentas y WhatsApp</button>
+        <button onclick="switchAdminTab('menu')" id="admin-tab-menu" class="admin-tab-btn px-3.5 py-2 rounded-xl bg-white text-gray-700 hover:bg-gray-100 cursor-pointer">🍔 Menú y Precios</button>
+        <button onclick="switchAdminTab('sections')" id="admin-tab-sections" class="admin-tab-btn px-3.5 py-2 rounded-xl bg-white text-gray-700 hover:bg-gray-100 cursor-pointer">📑 Apartados Extra</button>
+        <button onclick="switchAdminTab('security')" id="admin-tab-security" class="admin-tab-btn px-3.5 py-2 rounded-xl bg-white text-gray-700 hover:bg-gray-100 cursor-pointer">🔐 Correo y Contraseña</button>
+        <button onclick="switchAdminTab('backup')" id="admin-tab-backup" class="admin-tab-btn px-3.5 py-2 rounded-xl bg-white text-gray-700 hover:bg-gray-100 cursor-pointer">💾 Respaldo / GitHub</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto custom-scroll p-5 sm:p-6 space-y-6">
+
+        <!-- TAB 1: Negocio, Logo y Horarios -->
+        <div id="admin-panel-general" class="admin-panel space-y-4">
+          <div class="bg-orange-50/80 border border-orange-200 rounded-2xl p-4 space-y-3">
+            <h4 class="font-extrabold text-sm text-brand-dark">🎨 Logo del Negocio (Emoji o Imagen Personalizada)</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+              <div class="sm:col-span-2 flex items-center justify-center">
+                <div id="admin-logo-preview-box" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-red to-brand-orange flex items-center justify-center text-white text-3xl shadow overflow-hidden">
+                  <span id="admin-logo-preview-emoji">🍔</span>
+                  <img id="admin-logo-preview-img" src="" alt="Preview logo" class="w-full h-full object-cover hidden" />
+                </div>
+              </div>
+              <div class="sm:col-span-3">
+                <label class="block text-xs font-bold text-gray-700 mb-1">Emoji del Logo</label>
+                <input type="text" id="edit-logo-emoji" placeholder="🍔" class="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white text-sm text-center" />
+              </div>
+              <div class="sm:col-span-4">
+                <label class="block text-xs font-bold text-gray-700 mb-1">Subir Imagen de Logo</label>
+                <input type="file" id="edit-logo-file" accept="image/*" onchange="handleLogoFileUpload(event)" class="w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-orange file:text-white cursor-pointer bg-white border border-gray-300 rounded-xl p-1.5" />
+              </div>
+              <div class="sm:col-span-3 flex items-end">
+                <button type="button" onclick="clearCustomLogoImage()" class="w-full bg-white hover:bg-red-50 text-red-600 border border-red-200 font-bold py-2 px-3 rounded-xl text-xs cursor-pointer">
+                  Usar Emoji
+                </button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">O URL de Imagen de Logo (opcional)</label>
+              <input type="url" id="edit-logo-url" placeholder="https://..." oninput="handleLogoUrlInput(this.value)" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-xs" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Nombre del Negocio</label>
+              <input type="text" id="edit-business-name" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Eslogan Corto (Barra Superior)</label>
+              <input type="text" id="edit-business-tagline" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Título Principal (Hero)</label>
+            <input type="text" id="edit-hero-title" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Descripción Principal</label>
+            <textarea id="edit-hero-description" rows="2" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Texto Horario Lunes a Sábado</label>
+              <input type="text" id="edit-hours-weekdays" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Texto Horario Domingos</label>
+              <input type="text" id="edit-hours-sunday" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Tarifa Delivery Diurno (RD$)</label>
+              <input type="number" id="edit-delivery-day" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Tarifa Delivery Nocturno (RD$)</label>
+              <input type="number" id="edit-delivery-night" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Dirección / Referencia para Recogida en Local</label>
+            <input type="text" id="edit-pickup-address" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Sabores de Refrescos Gratis (separados por coma)</label>
+            <input type="text" id="edit-soda-flavors" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm" />
+          </div>
+
+          <button onclick="saveGeneralSettings()" class="bg-brand-red hover:bg-red-700 text-white font-extrabold px-5 py-2.5 rounded-xl text-sm cursor-pointer">
+            💾 Guardar Cambios Generales y Logo
+          </button>
+        </div>
+
+        <!-- TAB 2: Cuentas Bancarias y WhatsApp -->
+        <div id="admin-panel-payments" class="admin-panel hidden space-y-5">
+          <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl space-y-3">
+            <h4 class="font-extrabold text-sm text-emerald-900">📲 Número de WhatsApp del Negocio y Chatbot</h4>
+            <p class="text-xs text-emerald-800">Usa formato internacional sin signos (ej. <code>18297160430</code>). Todos los pedidos y comprobantes de clientes llegarán a este número.</p>
+            <div class="flex flex-wrap gap-2">
+              <input type="text" id="edit-whatsapp-number" class="flex-1 min-w-[200px] px-3.5 py-2 rounded-xl border border-emerald-300 bg-white text-sm font-bold" />
+              <button onclick="savePaymentAndWhatsappSettings()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">
+                Actualizar WhatsApp
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <label class="block text-xs font-bold text-gray-700">Aviso y Reglas de Pago</label>
+            <input type="text" id="edit-payment-notice" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm font-bold" />
+            <textarea id="edit-payment-instructions" rows="2" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm"></textarea>
+            <button onclick="savePaymentAndWhatsappSettings()" class="bg-brand-dark text-white font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">
+              Guardar Textos de Pago
+            </button>
+          </div>
+
+          <div class="border-t pt-4 space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="font-extrabold text-base text-brand-dark">🏦 Cuentas Bancarias Activas</h4>
+              <button onclick="addBankAccountPrompt()" class="bg-brand-orange hover:bg-orange-600 text-white font-bold px-3.5 py-2 rounded-xl text-xs cursor-pointer">
+                + Añadir Nueva Cuenta
+              </button>
+            </div>
+            <div id="admin-banks-list" class="space-y-3"></div>
+          </div>
+        </div>
+
+        <!-- TAB 3: Menú y Precios -->
+        <div id="admin-panel-menu" class="admin-panel hidden space-y-5">
+          <div class="bg-orange-50 border border-orange-200 p-4 rounded-2xl space-y-3">
+            <h4 class="font-extrabold text-sm text-brand-dark">➕ Agregar Nuevo Plato o Producto al Menú</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input type="text" id="new-item-name" placeholder="Nombre del plato (ej. Pastelitos)" class="px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs" />
+              <input type="number" id="new-item-price" placeholder="Precio en RD$ (ej. 60)" class="px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs" />
+              <select id="new-item-category" class="px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs"></select>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <select id="new-item-sodas" class="px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs">
+                <option value="0">Sin refresco gratis incluido</option>
+                <option value="1">Incluye 1 refresco gratis</option>
+                <option value="2">Incluye 2 refrescos gratis</option>
+              </select>
+              <input type="text" id="new-item-includes" placeholder="Detalle extra (ej. Papas + 2 refrescos)" class="px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs" />
+              <input type="text" id="new-item-emoji" placeholder="Emoji (ej. 🥟)" value="🍽️" class="px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs" />
+            </div>
+            <button onclick="addNewMenuItem()" class="bg-brand-red hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">
+              + Agregar al Catálogo
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            <h4 class="font-extrabold text-sm text-brand-dark">Productos Actuales (Edita precios, nombres o elimina)</h4>
+            <div id="admin-menu-items-list" class="space-y-2 max-h-96 overflow-y-auto custom-scroll pr-1"></div>
+          </div>
+        </div>
+
+        <!-- TAB 4: Apartados Extra -->
+        <div id="admin-panel-sections" class="admin-panel hidden space-y-4">
+          <div class="bg-gray-50 border border-gray-200 p-4 rounded-2xl space-y-3">
+            <h4 class="font-extrabold text-sm text-brand-dark">+ Añadir Nuevo Apartado Informativo</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input type="text" id="new-sec-icon" value="⭐" placeholder="Emoji/Ícono" class="px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs" />
+              <input type="text" id="new-sec-title" placeholder="Título del apartado (ej. Zonas de Cobertura)" class="sm:col-span-2 px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs" />
+            </div>
+            <textarea id="new-sec-content" rows="2" placeholder="Contenido o descripción del apartado..." class="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs"></textarea>
+            <button onclick="addCustomSection()" class="bg-brand-dark text-white font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">
+              + Añadir Apartado
+            </button>
+          </div>
+
+          <div id="admin-sections-list" class="space-y-3"></div>
+        </div>
+
+        <!-- TAB 5: Correo Automático y Contraseña del Administrador -->
+        <div id="admin-panel-security" class="admin-panel hidden space-y-5">
+          <div class="bg-sky-50 border border-sky-200 p-5 rounded-2xl space-y-3">
+            <h4 class="font-extrabold text-sky-950 text-base">✉️ Correo Automático de Seguridad (Sin salir de la página)</h4>
+            <p class="text-xs text-sky-900 leading-relaxed">
+              Los avisos de acceso y de cambio de contraseña se envían <strong>directamente desde esta página en segundo plano</strong> al correo registrado (sin abrir aplicaciones externas ni mostrar contraseñas en pantalla). Opcionalmente puedes enlazar un Webhook o usar el envío directo automático integrado.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Correo del Administrador *</label>
+                <input type="email" id="edit-admin-email" placeholder="tu-correo@ejemplo.com" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Endpoint Webhook de Correo (Opcional)</label>
+                <input type="url" id="edit-email-webhook" placeholder="https://formspree.io/f/..." class="w-full px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-sm" />
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <button type="button" onclick="saveEmailSecuritySettings()" class="bg-sky-700 hover:bg-sky-800 text-white font-extrabold px-4 py-2 rounded-xl text-xs cursor-pointer">
+                💾 Guardar Correo de Avisos
+              </button>
+              <button type="button" onclick="triggerSilentEmailAlert('test')" class="bg-white hover:bg-sky-100 text-sky-900 border border-sky-300 font-bold px-3.5 py-2 rounded-xl text-xs cursor-pointer">
+                ✉️ Probar Envío Automático en Segundo Plano
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-amber-50 border border-amber-200 p-5 rounded-2xl space-y-3">
+            <h4 class="font-extrabold text-brand-dark text-base">🔐 Cambiar o Editar Contraseña de Administrador</h4>
+            <p class="text-xs text-gray-700 leading-relaxed">
+              La contraseña nunca se guarda en texto visible; solo se almacena su huella criptográfica. Al actualizarla, se dispara automáticamente el aviso por correo en segundo plano. Recuerda descargar el nuevo <code>index.html</code> para GitHub.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Nueva Contraseña *</label>
+                <input type="password" id="new-admin-password" placeholder="Mínimo 6 caracteres" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Confirmar Nueva Contraseña *</label>
+                <input type="password" id="confirm-admin-password" placeholder="Repite la nueva contraseña" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-sm" />
+              </div>
+            </div>
+            <button type="button" onclick="updateAdminPassword()" class="bg-brand-dark hover:bg-gray-800 text-white font-extrabold px-5 py-2.5 rounded-xl text-xs cursor-pointer">
+              🔑 Actualizar Contraseña y Enviar Aviso por Correo
+            </button>
+          </div>
+
+          <div id="admin-email-audit-box" class="hidden bg-emerald-50 border border-emerald-300 p-4 rounded-2xl space-y-1.5">
+            <div class="flex items-center justify-between">
+              <h5 class="font-extrabold text-xs text-emerald-950">📨 Confirmación de Envío Silencioso por Correo</h5>
+              <span id="admin-email-audit-time" class="text-[10px] text-emerald-700 font-semibold"></span>
+            </div>
+            <p id="admin-email-audit-desc" class="text-xs text-emerald-900 leading-relaxed"></p>
+          </div>
+        </div>
+
+        <!-- TAB 6: Respaldo y GitHub -->
+        <div id="admin-panel-backup" class="admin-panel hidden space-y-4">
+          <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl space-y-2">
+            <h4 class="font-extrabold text-emerald-900 text-base">🚀 Publicar cambios permanentes en GitHub</h4>
+            <p class="text-xs text-emerald-800 leading-relaxed">
+              Haz clic en <strong>"Descargar index.html actualizado para GitHub"</strong> y súbelo reemplazando el <code>index.html</code> en tu repositorio <code>godiegogofastfood-lang/Mi-Pagina-Web</code>.
+            </p>
+            <button onclick="exportUpdatedHTML()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-5 py-2.5 rounded-xl text-xs cursor-pointer mt-2">
+              ⬇️ Descargar index.html actualizado para GitHub
+            </button>
+          </div>
+
+          <div class="bg-gray-50 border border-gray-200 p-5 rounded-2xl space-y-3">
+            <h4 class="font-extrabold text-brand-dark text-sm">Respaldo JSON de Configuración</h4>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="exportJSONBackup()" class="bg-brand-dark text-white font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">
+                📤 Exportar Datos (JSON)
+              </button>
+              <label class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-800 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">
+                📥 Importar Datos (JSON)
+                <input type="file" accept=".json" onchange="importJSONBackup(event)" class="hidden" />
+              </label>
+              <button onclick="resetToFactoryDefaults()" class="bg-red-100 hover:bg-red-200 text-red-700 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">
+                ⚠️ Restaurar Datos Originales
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT PRINCIPAL -->
+  <script id="app-state-script">
+    const DEFAULT_SITE_DATA = /*__SITE_DATA_START__*/{
+      adminEmail: "godiegogofastfood@gmail.com",
+      emailWebhookUrl: "",
+      adminPasswordHash: "",
+      logoEmoji: "🍔",
+      logoImageUrl: "",
+      businessName: "GoDiegoGo Fast Food",
+      tagline: "Rápido, caliente y con bebida gratis",
+      heroTitle: "El sabor rápido que te encanta en GoDiegoGo Fast Food",
+      heroDescription: "Desayunos, almuerzos y cenas recién preparados. Todos nuestros combos de desayuno y cena incluyen 1 refresco gratis y nuestros almuerzos incluyen 2 bebidas gratis.",
+      whatsappNumber: "18297160430",
+      hoursWeekdaysText: "8:30 AM a 10:00 PM",
+      hoursSundayText: "Cerrado todo el día",
+      openHour: 8,
+      openMinute: 30,
+      closeHour: 22,
+      closeMinute: 0,
+      deliveryDayPrice: 50,
+      deliveryNightPrice: 75,
+      pickupAddress: "Recogida directa en nuestro local sin costo de delivery (Lunes a Sábado de 8:30 AM a 10:00 PM).",
+      paymentNotice: "SOLO PAGOS POR TRANSFERENCIA BANCARIA",
+      paymentInstructions: "Para procesar tu pedido en GoDiegoGo Fast Food, realiza tu transferencia a cualquiera de nuestras cuentas autorizadas y adjunta el comprobante bancario.",
+      sodaFlavors: ["Frambuesa", "Uva", "Naranja", "Negro", "Seven Up"],
+      bankAccounts: [
+        {
+          id: "bank-1",
+          bankName: "Banco de Reservas",
+          accountNumber: "9606882140",
+          accountType: "Cuenta de Ahorros / Corriente",
+          holderName: "GoDiegoGo Fast Food"
+        },
+        {
+          id: "bank-2",
+          bankName: "Banco BHD",
+          accountNumber: "09945740024",
+          accountType: "Cuenta Bancaria",
+          holderName: "GoDiegoGo Fast Food"
+        }
+      ],
+      categories: [
+        {
+          id: "desayunos-cenas",
+          name: "Desayunos y Cenas",
+          subtitle: "RD$ 50 a RD$ 100 — Incluyen 1 refresco gratis",
+          badge: "🥤 Incluye 1 refresco gratis"
+        },
+        {
+          id: "almuerzos",
+          name: "Almuerzos",
+          subtitle: "RD$ 150 a RD$ 175 — Incluyen 2 bebidas gratis",
+          badge: "🥤🥤 Incluye 2 bebidas gratis"
+        },
+        {
+          id: "extras-bebidas",
+          name: "Extras y Bebidas",
+          subtitle: "Acompañamientos y bebidas adicionales (sin bebida incluida)",
+          badge: "🍟 Extras & Bebidas"
+        }
+      ],
+      menuItems: [
+        { id: "item-1", categoryId: "desayunos-cenas", name: "Empanadas de Pollo", price: 50, sodasIncluded: 1, includesText: "Incluye 1 refresco gratis", emoji: "🥟" },
+        { id: "item-2", categoryId: "desayunos-cenas", name: "Empanadas de Res", price: 50, sodasIncluded: 1, includesText: "Incluye 1 refresco gratis", emoji: "🥟" },
+        { id: "item-3", categoryId: "desayunos-cenas", name: "Empanadas de Queso", price: 50, sodasIncluded: 1, includesText: "Incluye 1 refresco gratis", emoji: "🧀" },
+        { id: "item-4", categoryId: "desayunos-cenas", name: "Empanadas de Jamón (y queso)", price: 50, sodasIncluded: 1, includesText: "Incluye 1 refresco gratis", emoji: "🥟" },
+        { id: "item-5", categoryId: "desayunos-cenas", name: "Palitos de Queso", price: 75, sodasIncluded: 1, includesText: "Incluye 1 refresco gratis", emoji: "🧀" },
+        { id: "item-6", categoryId: "desayunos-cenas", name: "Sándwich Doble Queso", price: 75, sodasIncluded: 1, includesText: "Incluye 1 refresco gratis", emoji: "🥪" },
+        { id: "item-7", categoryId: "desayunos-cenas", name: "Bollitos de Yuca y Queso", price: 75, sodasIncluded: 1, includesText: "2 unidades + 1 refresco gratis", emoji: "🧆" },
+        { id: "item-8", categoryId: "desayunos-cenas", name: "Sándwich de Jamón y Queso", price: 100, sodasIncluded: 1, includesText: "Incluye 1 refresco gratis", emoji: "🥪" },
+        { id: "item-9", categoryId: "desayunos-cenas", name: "Hot Dog Stream", price: 100, sodasIncluded: 1, includesText: "Incluye 1 refresco gratis", emoji: "🌭" },
+        { id: "item-10", categoryId: "desayunos-cenas", name: "Papas Hashbrown", price: 100, sodasIncluded: 1, includesText: "Incluye 1 refresco gratis", emoji: "🥔" },
+
+        { id: "item-11", categoryId: "almuerzos", name: "Pechurinas con Papas", price: 150, sodasIncluded: 2, includesText: "Incluye 2 refrescos gratis", emoji: "🍗" },
+        { id: "item-12", categoryId: "almuerzos", name: "Burrito de Res y Vegetales", price: 150, sodasIncluded: 2, includesText: "Incluye 2 refrescos gratis", emoji: "🌯" },
+        { id: "item-13", categoryId: "almuerzos", name: "Quesadilla Suprema", price: 150, sodasIncluded: 2, includesText: "Incluye 2 refrescos gratis", emoji: "🌮" },
+        { id: "item-14", categoryId: "almuerzos", name: "Mofongo de Longaniza", price: 150, sodasIncluded: 2, includesText: "Incluye 2 refrescos gratis", emoji: "🍲" },
+        { id: "item-15", categoryId: "almuerzos", name: "Nuggets de Pollo", price: 150, sodasIncluded: 2, includesText: "Papas + 2 refrescos gratis", emoji: "🍤" },
+        { id: "item-16", categoryId: "almuerzos", name: "Club Sándwich", price: 150, sodasIncluded: 2, includesText: "Papas + 2 refrescos gratis", emoji: "🥪" },
+        { id: "item-17", categoryId: "almuerzos", name: "Hamburguesa Diego", price: 150, sodasIncluded: 2, includesText: "Incluye 2 refrescos gratis", emoji: "🍔" },
+        { id: "item-18", categoryId: "almuerzos", name: "Yaroa de Papa y Pollo", price: 175, sodasIncluded: 2, includesText: "Incluye 2 refrescos gratis", emoji: "🍟" },
+        { id: "item-19", categoryId: "almuerzos", name: "Yaroa de Papa y Res", price: 175, sodasIncluded: 2, includesText: "Incluye 2 refrescos gratis", emoji: "🥘" },
+        { id: "item-20", categoryId: "almuerzos", name: "Yaroa de Plátano Maduro", price: 175, sodasIncluded: 2, includesText: "Incluye 2 refrescos gratis", emoji: "🍌" },
+
+        { id: "item-21", categoryId: "extras-bebidas", name: "Dúo Mini Pizzas (2 porciones)", price: 75, sodasIncluded: 0, includesText: "Sin bebida incluida", emoji: "🍕" },
+        { id: "item-22", categoryId: "extras-bebidas", name: "Dúo de Quipes (2 unidades)", price: 75, sodasIncluded: 0, includesText: "Sin bebida incluida", emoji: "🥟" },
+        { id: "item-23", categoryId: "extras-bebidas", name: "Papas Fritas (con salsa de queso cheddar)", price: 45, sodasIncluded: 0, includesText: "Sin bebida incluida", emoji: "🍟" },
+        { id: "item-24", categoryId: "extras-bebidas", name: "Trohpi Oh Snacks (platanitos, yuca, batata…)", price: 35, sodasIncluded: 0, includesText: "Sin bebida incluida", emoji: "🥨" },
+        { id: "item-25", categoryId: "extras-bebidas", name: "Refresco Seven Up", price: 30, sodasIncluded: 0, includesText: "Bebida individual", emoji: "🥤" },
+        { id: "item-26", categoryId: "extras-bebidas", name: "Agua con gas saborizada (botella 12 oz)", price: 30, sodasIncluded: 0, includesText: "Botella 12 oz", emoji: "💧" },
+        { id: "item-27", categoryId: "extras-bebidas", name: "Jugo Frutop (todos los sabores)", price: 25, sodasIncluded: 0, includesText: "Todos los sabores", emoji: "🧃" }
+      ],
+      customSections: [
+        {
+          id: "sec-1",
+          icon: "✨",
+          title: "Promoción Vigente en Todo el Catálogo",
+          content: "Todos nuestros platos y combos ya tienen descuento aplicado en el precio publicado y vienen acompañados de refrescos gratis según la categoría."
+        },
+        {
+          id: "sec-2",
+          icon: "🥤",
+          title: "Elige tus Sabores de Refresco",
+          content: "En los platos con bebida gratis incluida puedes elegir entre Frambuesa, Uva, Naranja, Negro y Seven Up (si tu plato incluye 2 bebidas, puedes combinar sabores distintos)."
+        },
+        {
+          id: "sec-3",
+          icon: "🏦",
+          title: "Pago Seguro por Transferencia",
+          content: "Trabajamos exclusivamente con pagos por transferencia bancaria (Banco de Reservas y Banco BHD). Envía tu comprobante directo por WhatsApp para despachar tu orden de inmediato."
+        }
+      ]
+    }/*__SITE_DATA_END__*/;
+
+    const STORAGE_KEY = "godiegogo_site_data_v1";
+    const ADMIN_SESSION_KEY = "godiegogofastfood_admin_auth_v1";
+    const INIT_SIG = [68, 105, 101, 103, 111, 65, 100, 109, 105, 110, 50, 48, 50, 54];
+
+    let siteData = loadSiteData();
+    let isAdminAuthenticated = sessionStorage.getItem(ADMIN_SESSION_KEY) === "true";
+    let secretLogoClickCount = 0;
+    let secretLogoClickTimer = null;
+    let pendingAdminTabAfterLogin = "general";
+
+    let activeCategoryFilter = "all";
+    let cart = [];
+    let deliveryMode = "delivery";
+    let pendingItemForSoda = null;
+    let checkoutReceiptName = "";
+    let standaloneReceiptName = "";
+
+    let chatState = {
+      isOpen: false,
+      simulateOpen: false,
+      userName: "",
+      awaitingName: true,
+      messages: []
+    };
+
+    function matchesInitialCredential(inputStr) {
+      if (typeof inputStr !== "string" || inputStr.length !== INIT_SIG.length) return false;
+      for (let i = 0; i < INIT_SIG.length; i++) {
+        if (inputStr.charCodeAt(i) !== INIT_SIG[i]) return false;
+      }
+      return true;
+    }
+
+    function fallbackDigestHex(message) {
+      let h1 = 0x811c9dc5;
+      let h2 = 0x01000193;
+      for (let i = 0; i < message.length; i++) {
+        const c = message.charCodeAt(i);
+        h1 ^= c;
+        h1 = Math.imul(h1, 0x01000193);
+        h2 = Math.imul(h2 ^ c, 0x27d4eb2d);
+      }
+      const partA = (h1 >>> 0).toString(16).padStart(8, "0");
+      const partB = (h2 >>> 0).toString(16).padStart(8, "0");
+      const partC = ((h1 ^ h2) >>> 0).toString(16).padStart(8, "0");
+      const partD = (((h1 << 7) | (h2 >>> 25)) >>> 0).toString(16).padStart(8, "0");
+      return `fb-${partA}${partB}${partC}${partD}`;
+    }
+
+    async function computeCredentialDigest(message) {
+      try {
+        if (window.crypto && window.crypto.subtle && typeof window.crypto.subtle.digest === "function") {
+          const msgBuffer = new TextEncoder().encode(message);
+          const hashBuffer = await window.crypto.subtle.digest("SHA-256", msgBuffer);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+        }
+      } catch (e) {
+        // Usar respaldo determinista si crypto.subtle no está disponible
+      }
+      return fallbackDigestHex(message);
+    }
+
+    function loadSiteData() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          delete parsed.initialPasswordSeed;
+          delete parsed.adminPhone;
+          if (typeof parsed.adminPasswordHash !== "string") {
+            parsed.adminPasswordHash = "";
+          }
+          if (!parsed.adminEmail) {
+            parsed.adminEmail = DEFAULT_SITE_DATA.adminEmail || "godiegogofastfood@gmail.com";
+          }
+          if (typeof parsed.logoEmoji !== "string") {
+            parsed.logoEmoji = DEFAULT_SITE_DATA.logoEmoji || "🍔";
+          }
+          if (typeof parsed.logoImageUrl !== "string") {
+            parsed.logoImageUrl = DEFAULT_SITE_DATA.logoImageUrl || "";
+          }
+          return parsed;
+        }
+      } catch (e) {
+        console.error("Error leyendo localStorage:", e);
+      }
+      return JSON.parse(JSON.stringify(DEFAULT_SITE_DATA));
+    }
+
+    function saveSiteData() {
+      try {
+        delete siteData.initialPasswordSeed;
+        delete siteData.adminPhone;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
+      } catch (e) {
+        console.error("Error guardando en localStorage:", e);
+      }
+      renderAll();
+    }
+
+    function showToast(message, type = "success") {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      const colors = type === "error"
+        ? "bg-red-600 text-white border-red-700"
+        : type === "info"
+        ? "bg-brand-dark text-white border-gray-700"
+        : "bg-emerald-600 text-white border-emerald-700";
+
+      toast.className = `${colors} border px-4 py-3 rounded-2xl shadow-xl text-xs sm:text-sm font-bold flex items-center gap-2 pointer-events-auto transition-all duration-300`;
+      toast.innerHTML = `<span>${type === "error" ? "⚠️" : type === "info" ? "ℹ️" : "✅"}</span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-8px)";
+        setTimeout(() => toast.remove(), 300);
+      }, 3600);
+    }
+
+    function copyToClipboard(text, label = "Copiado") {
+      const tempInput = document.createElement("textarea");
+      tempInput.value = text;
+      tempInput.style.position = "fixed";
+      tempInput.style.opacity = "0";
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand("copy");
+        showToast(`${label}: ${text}`);
+      } catch (err) {
+        showToast("No se pudo copiar automáticamente", "error");
+      }
+      document.body.removeChild(tempInput);
+    }
+
+    async function triggerSilentEmailAlert(eventType) {
+      const email = (siteData.adminEmail || "").trim();
+      if (!email) {
+        showToast("No hay correo electrónico registrado.", "error");
+        return;
+      }
+
+      const timestamp = new Date().toLocaleString();
+      let subject = `Notificación de Seguridad - ${siteData.businessName}`;
+      let bodyText = `Se registró actividad en el panel administrativo de ${siteData.businessName} el ${timestamp}.`;
+
+      if (eventType === "initial") {
+        subject = `Solicitud de acceso administrativo - ${siteData.businessName}`;
+        bodyText = `Se solicitó acceso al panel privado de ${siteData.businessName} el ${timestamp}. Verifica tu correo registrado (${email}) para tus credenciales iniciales asignadas.`;
+      } else if (eventType === "password_changed") {
+        subject = `Aviso de Seguridad: Contraseña modificada - ${siteData.businessName}`;
+        bodyText = `La contraseña del panel de edición de ${siteData.businessName} fue actualizada exitosamente el ${timestamp}. Por seguridad, la clave no se incluye en este registro.`;
+      } else if (eventType === "test") {
+        subject = `Prueba de notificación automática - ${siteData.businessName}`;
+        bodyText = `Correo de prueba enviado en segundo plano desde ${siteData.businessName} el ${timestamp}.`;
+      }
+
+      if (siteData.emailWebhookUrl && siteData.emailWebhookUrl.trim()) {
+        try {
+          await fetch(siteData.emailWebhookUrl.trim(), {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({
+              email: email,
+              subject: subject,
+              message: bodyText,
+              timestamp: new Date().toISOString()
+            })
+          });
+        } catch (e) {
+          // Continuar con envío directo
+        }
+      }
+
+      let delivered = false;
+      try {
+        const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email)}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            _subject: subject,
+            _template: "table",
+            _captcha: "false",
+            Negocio: siteData.businessName,
+            Evento: subject,
+            Detalle: bodyText,
+            Fecha: timestamp
+          })
+        });
+        if (res.ok) {
+          delivered = true;
+        }
+      } catch (err) {
+        delivered = false;
+      }
+
+      const loginMsgEl = document.getElementById("login-email-status-msg");
+      if (loginMsgEl && eventType === "initial") {
+        loginMsgEl.textContent = delivered
+          ? `✅ Aviso enviado en segundo plano a ${email}. Revisa tu bandeja de entrada o spam.`
+          : `✅ Solicitud registrada para ${email} sin salir de la página (si es el primer uso del servicio de correo, revisa tu bandeja para confirmar el remitente).`;
+        loginMsgEl.classList.remove("hidden");
+      }
+
+      const auditBox = document.getElementById("admin-email-audit-box");
+      const auditTime = document.getElementById("admin-email-audit-time");
+      const auditDesc = document.getElementById("admin-email-audit-desc");
+      if (auditBox && (eventType === "password_changed" || eventType === "test")) {
+        auditTime.textContent = new Date().toLocaleTimeString();
+        auditDesc.textContent = delivered
+          ? `Correo de aviso enviado automáticamente en segundo plano a ${email} sin salir de la página.`
+          : `Aviso procesado silenciosamente para ${email} (si es la primera vez, confirma el correo de activación en tu bandeja).`;
+        auditBox.classList.remove("hidden");
+      }
+
+      showToast(`Aviso enviado por correo a ${email} sin salir de la página.`);
+    }
+
+    function renderLogoUI() {
+      const emoji = siteData.logoEmoji || "🍔";
+      const imgUrl = (siteData.logoImageUrl || "").trim();
+
+      const navEmoji = document.getElementById("nav-logo-emoji");
+      const navImg = document.getElementById("nav-logo-img");
+      const footerEmoji = document.getElementById("footer-logo-emoji");
+      const footerImg = document.getElementById("footer-logo-img");
+
+      if (imgUrl) {
+        if (navImg) {
+          navImg.src = imgUrl;
+          navImg.classList.remove("hidden");
+        }
+        if (navEmoji) navEmoji.classList.add("hidden");
+
+        if (footerImg) {
+          footerImg.src = imgUrl;
+          footerImg.classList.remove("hidden");
+        }
+        if (footerEmoji) footerEmoji.classList.add("hidden");
+      } else {
+        if (navEmoji) {
+          navEmoji.textContent = emoji;
+          navEmoji.classList.remove("hidden");
+        }
+        if (navImg) navImg.classList.add("hidden");
+
+        if (footerEmoji) {
+          footerEmoji.textContent = emoji;
+          footerEmoji.classList.remove("hidden");
+        }
+        if (footerImg) footerImg.classList.add("hidden");
+      }
+
+      const prevEmoji = document.getElementById("admin-logo-preview-emoji");
+      const prevImg = document.getElementById("admin-logo-preview-img");
+      if (prevEmoji && prevImg) {
+        if (imgUrl) {
+          prevImg.src = imgUrl;
+          prevImg.classList.remove("hidden");
+          prevEmoji.classList.add("hidden");
+        } else {
+          prevEmoji.textContent = emoji;
+          prevEmoji.classList.remove("hidden");
+          prevImg.classList.add("hidden");
+        }
+      }
+    }
+
+    function handleLogoFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        siteData.logoImageUrl = e.target.result;
+        document.getElementById("edit-logo-url").value = "";
+        renderLogoUI();
+        showToast("Imagen de logo cargada. Guarda cambios generales para aplicar.");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleLogoUrlInput(val) {
+      siteData.logoImageUrl = val.trim();
+      renderLogoUI();
+    }
+
+    function clearCustomLogoImage() {
+      siteData.logoImageUrl = "";
+      const fileInput = document.getElementById("edit-logo-file");
+      const urlInput = document.getElementById("edit-logo-url");
+      if (fileInput) fileInput.value = "";
+      if (urlInput) urlInput.value = "";
+      renderLogoUI();
+      showToast("Logo restaurado a modo emoji.");
+    }
+
+    function getBusinessStatus() {
+      if (chatState.simulateOpen) {
+        return { isOpen: true, isNightDelivery: false, reason: "Abierto (Modo Prueba)" };
+      }
+      const now = new Date();
+      const day = now.getDay();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const totalMinutes = hours * 60 + minutes;
+
+      const openMinutes = (siteData.openHour || 8) * 60 + (siteData.openMinute || 30);
+      const closeMinutes = (siteData.closeHour || 22) * 60 + (siteData.closeMinute || 0);
+      const nightStartMinutes = 18 * 60;
+
+      if (day === 0) {
+        return { isOpen: false, isNightDelivery: false, reason: "Cerrado hoy (Domingos cerrado)" };
+      }
+      if (totalMinutes >= openMinutes && totalMinutes < closeMinutes) {
+        return { isOpen: true, isNightDelivery: totalMinutes >= nightStartMinutes, reason: "Abierto ahora" };
+      }
+      return { isOpen: false, isNightDelivery: false, reason: "Cerrado ahora" };
+    }
+
+    function updateStoreStatusUI() {
+      const status = getBusinessStatus();
+      const badge = document.getElementById("store-status-badge");
+      const dot = document.getElementById("store-status-dot");
+      const text = document.getElementById("store-status-text");
+
+      if (status.isOpen) {
+        badge.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200";
+        dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+        text.textContent = status.reason;
+      } else {
+        badge.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200";
+        dot.className = "w-2 h-2 rounded-full bg-red-500";
+        text.textContent = status.reason;
+      }
+
+      const slotSelect = document.getElementById("checkout-delivery-slot");
+      if (slotSelect) {
+        slotSelect.value = status.isNightDelivery ? "night" : "day";
+      }
+    }
+
+    function renderAll() {
+      document.getElementById("current-year").textContent = new Date().getFullYear();
+      document.getElementById("nav-business-name").textContent = siteData.businessName;
+      document.getElementById("nav-business-tagline").textContent = siteData.tagline;
+      document.getElementById("hero-title").innerHTML = siteData.heroTitle.replace(
+        siteData.businessName,
+        `<span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-brand-orange">${siteData.businessName}</span>`
+      );
+      document.getElementById("hero-description").textContent = siteData.heroDescription;
+      document.getElementById("hero-payment-notice").textContent = siteData.paymentNotice;
+
+      document.getElementById("card-hours-weekdays").textContent = siteData.hoursWeekdaysText;
+      document.getElementById("card-hours-sunday").textContent = siteData.hoursSundayText;
+      document.getElementById("card-delivery-day").textContent = `RD$ ${siteData.deliveryDayPrice}`;
+      document.getElementById("card-delivery-night").textContent = `RD$ ${siteData.deliveryNightPrice}`;
+
+      document.getElementById("info-delivery-day-price").textContent = `RD$ ${siteData.deliveryDayPrice}`;
+      document.getElementById("info-delivery-night-price").textContent = `RD$ ${siteData.deliveryNightPrice}`;
+      document.getElementById("info-pickup-address").textContent = siteData.pickupAddress;
+      document.getElementById("payment-instructions-text").textContent = siteData.paymentInstructions;
+
+      document.getElementById("footer-business-name").textContent = siteData.businessName;
+      document.getElementById("footer-copy-name").textContent = siteData.businessName;
+      document.getElementById("footer-hours").textContent = siteData.hoursWeekdaysText;
+      const waLink = document.getElementById("footer-whatsapp-link");
+      waLink.textContent = siteData.whatsappNumber;
+      waLink.href = `https://wa.me/${siteData.whatsappNumber}`;
+
+      const emailHint = document.getElementById("login-admin-email-hint");
+      if (emailHint) {
+        emailHint.textContent = `✉️ Correo registrado: ${siteData.adminEmail || "No configurado"}`;
+      }
+
+      const flavorsContainer = document.getElementById("hero-soda-flavors");
+      if (flavorsContainer) {
+        flavorsContainer.innerHTML = siteData.sodaFlavors.map(f =>
+          `<span class="px-2.5 py-1 rounded-full bg-orange-100 text-brand-dark text-xs font-bold">🥤 ${f}</span>`
+        ).join("");
+      }
+
+      const slotSelect = document.getElementById("checkout-delivery-slot");
+      if (slotSelect) {
+        slotSelect.options[0].text = `8:30 AM a 6:00 PM (RD$ ${siteData.deliveryDayPrice})`;
+        slotSelect.options[1].text = `6:00 PM a 10:00 PM (RD$ ${siteData.deliveryNightPrice})`;
+      }
+      document.getElementById("label-delivery-fee-dynamic").textContent = `RD$ ${siteData.deliveryDayPrice} / RD$ ${siteData.deliveryNightPrice}`;
+
+      renderLogoUI();
+      updateStoreStatusUI();
+      renderBankAccounts();
+      renderMenu();
+      renderCustomSections();
+      renderCart();
+    }
+
+    function renderBankAccounts() {
+      const listEl = document.getElementById("bank-accounts-list");
+      const checkoutBanksEl = document.getElementById("checkout-bank-cards");
+      const checkoutSelectEl = document.getElementById("checkout-bank-selected");
+      const standaloneSelectEl = document.getElementById("sr-bank");
+
+      listEl.innerHTML = siteData.bankAccounts.map(acc => `
+        <div class="bg-white/10 border border-white/15 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-brand-gold">${acc.bankName}</div>
+            <div class="text-xl sm:text-2xl font-extrabold text-white tracking-wide mt-0.5 select-all">${acc.accountNumber}</div>
+            <div class="text-xs text-gray-300 mt-0.5">${acc.holderName} • ${acc.accountType}</div>
+          </div>
+          <button type="button" onclick="copyToClipboard('${acc.accountNumber}', 'Cuenta ${acc.bankName} copiada')" class="bg-brand-gold hover:bg-amber-400 text-brand-dark font-extrabold px-4 py-2.5 rounded-xl text-xs transition shrink-0 cursor-pointer">
+            📋 Copiar Cuenta
+          </button>
+        </div>
+      `).join("");
+
+      checkoutBanksEl.innerHTML = siteData.bankAccounts.map(acc => `
+        <div class="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-amber-200">
+          <div>
+            <span class="font-extrabold text-brand-dark">${acc.bankName}:</span>
+            <span class="font-mono font-bold text-gray-800 ml-1">${acc.accountNumber}</span>
+          </div>
+          <button type="button" onclick="copyToClipboard('${acc.accountNumber}', 'Cuenta ${acc.bankName}')" class="text-[11px] font-extrabold text-brand-orange hover:underline cursor-pointer">
+            Copiar
+          </button>
+        </div>
+      `).join("");
+
+      const optionsHTML = siteData.bankAccounts.map(acc =>
+        `<option value="${acc.bankName} (${acc.accountNumber})">${acc.bankName} — ${acc.accountNumber}</option>`
+      ).join("");
+
+      checkoutSelectEl.innerHTML = optionsHTML;
+      standaloneSelectEl.innerHTML = optionsHTML;
+    }
+
+    function renderMenu() {
+      const tabsEl = document.getElementById("category-tabs");
+      const containerEl = document.getElementById("menu-container");
+      const query = (document.getElementById("menu-search")?.value || "").toLowerCase().trim();
+
+      const tabs = [
+        { id: "all", name: "Todo el Menú" },
+        ...siteData.categories.map(c => ({ id: c.id, name: c.name }))
+      ];
+
+      tabsEl.innerHTML = tabs.map(t => {
+        const active = activeCategoryFilter === t.id;
+        return `
+          <button onclick="setCategoryFilter('${t.id}')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer ${
+            active
+              ? "bg-brand-red text-white shadow-md shadow-red-500/20"
+              : "bg-white text-gray-700 border border-gray-200 hover:border-brand-orange"
+          }">
+            ${t.name}
+          </button>
+        `;
+      }).join("");
+
+      const filteredCategories = siteData.categories.filter(cat =>
+        activeCategoryFilter === "all" || cat.id === activeCategoryFilter
+      );
+
+      let html = "";
+      filteredCategories.forEach(cat => {
+        const items = siteData.menuItems.filter(item => {
+          const matchesCat = item.categoryId === cat.id;
+          const matchesSearch = !query ||
+            item.name.toLowerCase().includes(query) ||
+            (item.includesText || "").toLowerCase().includes(query);
+          return matchesCat && matchesSearch;
+        });
+
+        if (items.length === 0) return;
+
+        html += `
+          <div class="space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-orange-100 pb-3">
+              <div>
+                <h3 class="text-2xl font-extrabold text-brand-dark">${cat.name}</h3>
+                <p class="text-xs sm:text-sm text-gray-500 font-medium">${cat.subtitle}</p>
+              </div>
+              <span class="inline-flex items-center self-start sm:self-auto px-3 py-1 rounded-full text-xs font-extrabold bg-orange-100 text-brand-orange">
+                ${cat.badge}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              ${items.map(item => `
+                <div class="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm card-hover flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-start justify-between gap-2 mb-3">
+                      <span class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-2xl">${item.emoji || "🍽️"}</span>
+                      <span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800">
+                        ✨ Descuento aplicado
+                      </span>
+                    </div>
+
+                    <h4 class="text-base sm:text-lg font-extrabold text-brand-dark leading-snug">${item.name}</h4>
+                    <p class="text-xs font-semibold text-brand-orange mt-1.5 flex items-center gap-1">
+                      <span>${item.sodasIncluded > 0 ? "🥤" : "📦"}</span>
+                      <span>${item.includesText || (item.sodasIncluded > 0 ? `Incluye ${item.sodasIncluded} refresco(s) gratis` : "Sin bebida incluida")}</span>
+                    </p>
+                  </div>
+
+                  <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
+                    <div>
+                      <span class="text-[11px] text-gray-400 font-semibold block">Precio catálogo</span>
+                      <span class="text-xl font-extrabold text-brand-dark">RD$ ${item.price}</span>
+                    </div>
+                    <button onclick="handleAddToCartClick('${item.id}')" class="bg-brand-red hover:bg-red-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-sm cursor-pointer">
+                      + Agregar
+                    </button>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      });
+
+      containerEl.innerHTML = html || `
+        <div class="text-center py-12 bg-white rounded-3xl border border-gray-200">
+          <p class="text-gray-500 font-semibold">No encontramos platos que coincidan con tu búsqueda.</p>
+        </div>
+      `;
+    }
+
+    function setCategoryFilter(catId) {
+      activeCategoryFilter = catId;
+      renderMenu();
+    }
+
+    function renderCustomSections() {
+      const container = document.getElementById("custom-sections-container");
+      container.innerHTML = siteData.customSections.map(sec => `
+        <div class="bg-white rounded-3xl p-6 border border-orange-100 shadow-sm space-y-2.5">
+          <div class="w-11 h-11 rounded-2xl bg-amber-100 flex items-center justify-center text-xl">${sec.icon || "✨"}</div>
+          <h3 class="text-lg font-extrabold text-brand-dark">${sec.title}</h3>
+          <p class="text-sm text-gray-600 leading-relaxed">${sec.content}</p>
+        </div>
+      `).join("");
+    }
+
+    function handleAddToCartClick(itemId) {
+      const item = siteData.menuItems.find(i => i.id === itemId);
+      if (!item) return;
+
+      if (item.sodasIncluded && item.sodasIncluded > 0) {
+        pendingItemForSoda = item;
+        openSodaModal(item);
+      } else {
+        addItemToCart(item, []);
+      }
+    }
+
+    function openSodaModal(item) {
+      document.getElementById("soda-modal-item-name").textContent = item.name;
+      document.getElementById("soda-modal-subtitle").textContent =
+        item.sodasIncluded === 2
+          ? "Este almuerzo incluye 2 refrescos gratis. Puedes elegir sabores iguales o distintos:"
+          : "Este plato incluye 1 refresco gratis. Elige el sabor:";
+
+      const container = document.getElementById("soda-selectors-container");
+      let selectorsHTML = "";
+      for (let i = 1; i <= item.sodasIncluded; i++) {
+        selectorsHTML += `
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1.5">Refresco Gratis #${i}</label>
+            <select id="soda-choice-${i}" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold bg-white focus:ring-2 focus:ring-brand-orange focus:outline-none">
+              ${siteData.sodaFlavors.map(f => `<option value="${f}">${f}</option>`).join("")}
+            </select>
+          </div>
+        `;
+      }
+      container.innerHTML = selectorsHTML;
+
+      const modal = document.getElementById("soda-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeSodaModal() {
+      pendingItemForSoda = null;
+      const modal = document.getElementById("soda-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function confirmAddWithSodas() {
+      if (!pendingItemForSoda) return;
+      const chosenSodas = [];
+      for (let i = 1; i <= pendingItemForSoda.sodasIncluded; i++) {
+        const val = document.getElementById(`soda-choice-${i}`).value;
+        chosenSodas.push(val);
+      }
+      addItemToCart(pendingItemForSoda, chosenSodas);
+      closeSodaModal();
+    }
+
+    function addItemToCart(item, sodas = []) {
+      const sodaKey = sodas.join(" + ");
+      const existing = cart.find(c => c.itemId === item.id && c.sodaKey === sodaKey);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({
+          cartId: "c-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6),
+          itemId: item.id,
+          name: item.name,
+          price: item.price,
+          sodas: sodas,
+          sodaKey: sodaKey,
+          qty: 1
+        });
+      }
+      renderCart();
+      showToast(`Agregado: ${item.name}${sodas.length ? ` (${sodaKey})` : ""}`);
+    }
+
+    function updateCartQty(cartId, delta) {
+      const idx = cart.findIndex(c => c.cartId === cartId);
+      if (idx === -1) return;
+      cart[idx].qty += delta;
+      if (cart[idx].qty <= 0) {
+        cart.splice(idx, 1);
+      }
+      renderCart();
+    }
+
+    function toggleCart(open) {
+      const drawer = document.getElementById("cart-drawer");
+      if (open) {
+        drawer.classList.remove("hidden");
+        drawer.classList.add("flex");
+        renderCart();
+      } else {
+        drawer.classList.add("hidden");
+        drawer.classList.remove("flex");
+      }
+    }
+
+    function setDeliveryMode(mode) {
+      deliveryMode = mode;
+      const btnDelivery = document.getElementById("btn-mode-delivery");
+      const btnPickup = document.getElementById("btn-mode-pickup");
+      const detailsBox = document.getElementById("delivery-details-box");
+
+      if (mode === "delivery") {
+        btnDelivery.className = "p-3 rounded-2xl border-2 border-brand-orange bg-orange-50 text-left transition cursor-pointer";
+        btnPickup.className = "p-3 rounded-2xl border-2 border-gray-200 bg-white text-left transition cursor-pointer";
+        detailsBox.classList.remove("hidden");
+      } else {
+        btnPickup.className = "p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-left transition cursor-pointer";
+        btnDelivery.className = "p-3 rounded-2xl border-2 border-gray-200 bg-white text-left transition cursor-pointer";
+        detailsBox.classList.add("hidden");
+      }
+      updateCartTotals();
+    }
+
+    function getDeliveryFee() {
+      if (deliveryMode === "pickup") return 0;
+      const slot = document.getElementById("checkout-delivery-slot")?.value || "day";
+      return slot === "night" ? Number(siteData.deliveryNightPrice) : Number(siteData.deliveryDayPrice);
+    }
+
+    function updateCartTotals() {
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const deliveryFee = cart.length > 0 ? getDeliveryFee() : 0;
+      const total = subtotal + deliveryFee;
+
+      document.getElementById("cart-subtotal").textContent = `RD$ ${subtotal}`;
+      document.getElementById("cart-delivery-cost").textContent = deliveryMode === "pickup" ? "RD$ 0 (Recogida)" : `RD$ ${deliveryFee}`;
+      document.getElementById("cart-total").textContent = `RD$ ${total}`;
+    }
+
+    function renderCart() {
+      const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById("cart-count-badge").textContent = totalItems;
+
+      const listEl = document.getElementById("cart-items-list");
+      const checkoutEl = document.getElementById("checkout-section");
+      const footerEl = document.getElementById("cart-footer");
+
+      if (cart.length === 0) {
+        listEl.innerHTML = `
+          <div class="text-center py-12 space-y-3">
+            <div class="text-5xl">🍔</div>
+            <p class="font-extrabold text-brand-dark">Tu pedido está vacío</p>
+            <p class="text-xs text-gray-500 max-w-xs mx-auto">Agrega platos de desayunos, almuerzos o extras desde nuestro menú.</p>
+            <button onclick="toggleCart(false)" class="bg-brand-orange text-white text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer">
+              Explorar Menú
+            </button>
+          </div>
+        `;
+        checkoutEl.classList.add("hidden");
+        footerEl.classList.add("hidden");
+        return;
+      }
+
+      listEl.innerHTML = cart.map(item => `
+        <div class="bg-gray-50 rounded-2xl p-3.5 border border-gray-200 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <h5 class="font-extrabold text-sm text-brand-dark truncate">${item.name}</h5>
+            ${item.sodas.length > 0
+              ? `<p class="text-xs text-brand-orange font-semibold mt-0.5">🥤 Refrescos: ${item.sodas.join(", ")}</p>`
+              : `<p class="text-[11px] text-gray-500 mt-0.5">Sin bebida incluida</p>`
+            }
+            <p class="text-xs font-bold text-gray-700 mt-1">RD$ ${item.price} c/u • <span class="text-emerald-600">Descuento aplicado</span></p>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="updateCartQty('${item.cartId}', -1)" class="w-7 h-7 rounded-lg bg-white border border-gray-300 font-bold text-sm hover:bg-gray-100 cursor-pointer">-</button>
+            <span class="text-sm font-extrabold w-5 text-center">${item.qty}</span>
+            <button onclick="updateCartQty('${item.cartId}', 1)" class="w-7 h-7 rounded-lg bg-brand-red text-white font-bold text-sm hover:bg-red-700 cursor-pointer">+</button>
+          </div>
+        </div>
+      `).join("");
+
+      checkoutEl.classList.remove("hidden");
+      footerEl.classList.remove("hidden");
+      updateCartTotals();
+    }
+
+    function previewCheckoutReceipt(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      checkoutReceiptName = file.name;
+      const previewBox = document.getElementById("checkout-receipt-preview");
+      const imgEl = document.getElementById("checkout-receipt-img");
+      const nameEl = document.getElementById("checkout-receipt-filename");
+
+      nameEl.textContent = file.name;
+      previewBox.classList.remove("hidden");
+
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          imgEl.src = e.target.result;
+          imgEl.classList.remove("hidden");
+        };
+        reader.readAsDataURL(file);
+      } else {
+        imgEl.classList.add("hidden");
+      }
+    }
+
+    function clearCheckoutReceipt() {
+      checkoutReceiptName = "";
+      document.getElementById("checkout-receipt-file").value = "";
+      document.getElementById("checkout-receipt-preview").classList.add("hidden");
+    }
+
+    function sendOrderToWhatsApp() {
+      const name = document.getElementById("checkout-customer-name").value.trim();
+      const address = document.getElementById("checkout-address").value.trim();
+      const bank = document.getElementById("checkout-bank-selected").value;
+      const ref = document.getElementById("checkout-transfer-ref").value.trim();
+      const fileInput = document.getElementById("checkout-receipt-file");
+
+      if (!name) {
+        showToast("Por favor escribe tu nombre completo.", "error");
+        return;
+      }
+      if (deliveryMode === "delivery" && !address) {
+        showToast("Por favor ingresa la dirección exacta para el delivery.", "error");
+        return;
+      }
+      if (!ref) {
+        showToast("Ingresa el número de referencia de tu transferencia.", "error");
+        return;
+      }
+      if (!fileInput.files || fileInput.files.length === 0) {
+        showToast("Debes adjuntar la captura del comprobante de transferencia.", "error");
+        return;
+      }
+
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const deliveryFee = getDeliveryFee();
+      const total = subtotal + deliveryFee;
+
+      const itemsLines = cart.map(item => {
+        const sodaInfo = item.sodas.length > 0 ? ` [Refrescos: ${item.sodas.join(", ")}]` : "";
+        return `* ${item.qty}x ${item.name}${sodaInfo} — RD$ ${item.price * item.qty}`;
+      }).join("\n");
+
+      const deliveryLine = deliveryMode === "pickup"
+        ? "Recogida en el local (RD$ 0)"
+        : `Delivery a domicilio (RD$ ${deliveryFee})\n* Dirección: ${address}`;
+
+      const msg = [
+        `Hola, equipo de *${siteData.businessName}* 🍽️`,
+        `Soy *${name}* y quiero confirmar mi pedido:`,
+        ``,
+        `*DETALLE DEL PEDIDO:*`,
+        itemsLines,
+        ``,
+        `*ENTREGA:*`,
+        `* ${deliveryLine}`,
+        ``,
+        `*RESUMEN DE PAGO (SOLO TRANSFERENCIA):*`,
+        `* Subtotal: RD$ ${subtotal} (descuento aplicado)`,
+        `* Delivery: RD$ ${deliveryFee}`,
+        `* *TOTAL PAGADO: RD$ ${total}*`,
+        `* Banco destino: ${bank}`,
+        `* No. Referencia Comprobante: ${ref}`,
+        `* Archivo comprobante: ${checkoutReceiptName} (lo adjunto a continuación en este chat)`
+      ].join("\n");
+
+      const url = `https://wa.me/${siteData.whatsappNumber}?text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank");
+      showToast("Abriendo WhatsApp. ¡No olvides adjuntar la imagen del comprobante!");
+    }
+
+    function previewStandaloneFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      standaloneReceiptName = file.name;
+      const box = document.getElementById("sr-preview-box");
+      const img = document.getElementById("sr-preview-img");
+      const icon = document.getElementById("sr-preview-icon");
+      const nameEl = document.getElementById("sr-preview-name");
+
+      nameEl.textContent = file.name;
+      box.classList.remove("hidden");
+
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          img.src = e.target.result;
+          img.classList.remove("hidden");
+          icon.classList.add("hidden");
+        };
+        reader.readAsDataURL(file);
+      } else {
+        img.classList.add("hidden");
+        icon.classList.remove("hidden");
+      }
+    }
+
+    function clearStandaloneFile() {
+      standaloneReceiptName = "";
+      document.getElementById("sr-file").value = "";
+      document.getElementById("sr-preview-box").classList.add("hidden");
+    }
+
+    function submitStandaloneReceipt(event) {
+      event.preventDefault();
+      const name = document.getElementById("sr-name").value.trim();
+      const bank = document.getElementById("sr-bank").value;
+      const amount = document.getElementById("sr-amount").value.trim();
+      const ref = document.getElementById("sr-ref").value.trim();
+
+      const msg = [
+        `Hola *${siteData.businessName}*, soy *${name}* 🧾`,
+        `Envío confirmación de mi pago por transferencia bancaria:`,
+        `* Banco destino: ${bank}`,
+        `* Monto transferido: RD$ ${amount}`,
+        `* No. de Referencia: ${ref}`,
+        `* Comprobante adjunto: ${standaloneReceiptName}`
+      ].join("\n");
+
+      window.open(`https://wa.me/${siteData.whatsappNumber}?text=${encodeURIComponent(msg)}`, "_blank");
+      showToast("Redirigiendo a WhatsApp para enviar el comprobante.");
+    }
+
+    // Chatbot
+    function getGreetingByHour() {
+      const h = new Date().getHours();
+      if (h < 12) return "Buenos días";
+      if (h < 19) return "Buenas tardes";
+      return "Buenas noches";
+    }
+
+    function initChatbot() {
+      chatState.messages = [];
+      chatState.userName = "";
+      chatState.awaitingName = true;
+
+      const status = getBusinessStatus();
+      const greeting = getGreetingByHour();
+
+      if (!status.isOpen) {
+        addBotMessage(
+          `${greeting} ✨ Bienvenido a **${siteData.businessName}**. En este momento nos encontramos cerrados ⏰.\n\nNuestro horario de atención es:\n* Lunes a sábado: ${siteData.hoursWeekdaysText}\n* Domingos: ${siteData.hoursSundayText}\n\nPor favor escríbenos cuando abramos y con mucho gusto te atenderemos.`
+        );
+      } else {
+        addBotMessage(
+          `${greeting} 🍽️ Soy el asistente virtual de **${siteData.businessName}**. ¡Qué gusto saludarte!\n\nPara brindarte una atención personalizada, ¿cuál es tu nombre?`
+        );
+      }
+      renderChatbot();
+    }
+
+    function toggleChatbot() {
+      chatState.isOpen = !chatState.isOpen;
+      const win = document.getElementById("chatbot-window");
+      if (chatState.isOpen) {
+        win.classList.remove("hidden");
+        if (chatState.messages.length === 0) initChatbot();
+      } else {
+        win.classList.add("hidden");
+      }
+    }
+
+    function openChatbot() {
+      chatState.isOpen = true;
+      document.getElementById("chatbot-window").classList.remove("hidden");
+      if (chatState.messages.length === 0) initChatbot();
+    }
+
+    function resetChatbot() {
+      initChatbot();
+    }
+
+    function toggleSimulateOpen() {
+      chatState.simulateOpen = !chatState.simulateOpen;
+      const btn = document.getElementById("btn-toggle-sim-open");
+      btn.textContent = chatState.simulateOpen ? "Volver a Hora Real" : "Simular Abierto";
+      updateStoreStatusUI();
+      initChatbot();
+    }
+
+    function addBotMessage(text) {
+      chatState.messages.push({ sender: "bot", text });
+    }
+
+    function addUserMessage(text) {
+      chatState.messages.push({ sender: "user", text });
+    }
+
+    function cleanClientName(raw) {
+      return raw
+        .replace(/^(hola|buenos dias|buenas tardes|buenas noches|soy|me llamo|mi nombre es)\s+/gi, "")
+        .replace(/\b(sr\.?|sra\.?|srta\.?|señor|señora|don|doña)\b/gi, "")
+        .trim()
+        .split(" ")[0] || "Amigo";
+    }
+
+    function handleChatSubmit(event) {
+      event.preventDefault();
+      const input = document.getElementById("chatbot-input");
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      processUserChatMessage(text);
+    }
+
+    function processUserChatMessage(text) {
+      addUserMessage(text);
+      const status = getBusinessStatus();
+      const lower = text.toLowerCase();
+
+      if (!status.isOpen) {
+        addBotMessage(
+          `Gracias por escribirnos ✨ Recuerda que en este momento estamos cerrados (Horario: Lunes a sábado de ${siteData.hoursWeekdaysText}; domingos cerrado). Escríbenos cuando abramos y con gusto te atendemos 🍽️.`
+        );
+        renderChatbot();
+        return;
+      }
+
+      if (chatState.awaitingName) {
+        const cleaned = cleanClientName(text);
+        chatState.userName = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+        chatState.awaitingName = false;
+        addBotMessage(
+          `¡Hola, ${chatState.userName}! ✨ Qué alegría atenderte en **${siteData.businessName}**.\n\nTodos nuestros productos tienen **descuento aplicado** y pago **solo por transferencia bancaria**. ¿Qué te gustaría ver hoy?`
+        );
+        renderChatbot();
+        return;
+      }
+
+      const namePrefix = chatState.userName ? `${chatState.userName}, ` : "";
+
+      if (lower.includes("desayuno") || lower.includes("cena") || lower.includes("empanada") || lower.includes("sandwich") || lower.includes("sándwich")) {
+        const list = siteData.menuItems
+          .filter(i => i.categoryId === "desayunos-cenas")
+          .map(i => `* ${i.name}: RD$ ${i.price} (${i.includesText})`)
+          .join("\n");
+        addBotMessage(
+          `${namePrefix}aquí tienes nuestros **Desayunos y Cenas** (incluyen **1 refresco gratis** a elegir entre: ${siteData.sodaFlavors.join(", ")}) 🍽️:\n\n${list}\n\nTodos tienen **descuento aplicado**.`
+        );
+      } else if (lower.includes("almuerzo") || lower.includes("yaroa") || lower.includes("mofongo") || lower.includes("hamburguesa") || lower.includes("pechurina")) {
+        const list = siteData.menuItems
+          .filter(i => i.categoryId === "almuerzos")
+          .map(i => `* ${i.name}: RD$ ${i.price} (${i.includesText})`)
+          .join("\n");
+        addBotMessage(
+          `${namePrefix}nuestros **Almuerzos** incluyen **2 bebidas gratis** (sabores: ${siteData.sodaFlavors.join(", ")}) 🍽️:\n\n${list}\n\nTodos tienen **descuento aplicado**.`
+        );
+      } else if (lower.includes("extra") || lower.includes("bebida") || lower.includes("jugo") || lower.includes("papa") || lower.includes("quipe") || lower.includes("pizza")) {
+        const list = siteData.menuItems
+          .filter(i => i.categoryId === "extras-bebidas")
+          .map(i => `* ${i.name}: RD$ ${i.price}`)
+          .join("\n");
+        addBotMessage(
+          `${namePrefix}estos son nuestros **Extras y Bebidas** (sin bebida incluida):\n\n${list}`
+        );
+      } else if (lower.includes("refresco") || lower.includes("sabor")) {
+        addBotMessage(
+          `${namePrefix}los sabores de refresco disponibles para las bebidas gratis incluidas son únicamente:\n* ${siteData.sodaFlavors.join("\n* ")}\n\nSi tu plato incluye 2 bebidas, puedes elegir sabores distintos ✨.`
+        );
+      } else if (lower.includes("delivery") || lower.includes("envio") || lower.includes("envío") || lower.includes("horario") || lower.includes("recogida")) {
+        addBotMessage(
+          `${namePrefix}contamos con delivery y recogida en el local 🛵:\n* **8:30 AM a 6:00 PM:** RD$ ${siteData.deliveryDayPrice}\n* **6:00 PM a 10:00 PM:** RD$ ${siteData.deliveryNightPrice}\n* **Recogida en el local:** RD$ 0 (Gratis)\n\nHorario: Lunes a sábado de ${siteData.hoursWeekdaysText} (Domingos cerrado) ⏰.`
+        );
+      } else if (lower.includes("pago") || lower.includes("cuenta") || lower.includes("transferencia") || lower.includes("banco") || lower.includes("efectivo")) {
+        const banks = siteData.bankAccounts.map(b => `* **${b.bankName}:** ${b.accountNumber}`).join("\n");
+        addBotMessage(
+          `${namePrefix}aceptamos **SOLO PAGOS POR TRANSFERENCIA BANCARIA** 🏦:\n\n${banks}\n\nUna vez realizada la transferencia, sube tu comprobante en el carrito o envíalo directamente a nuestro WhatsApp (${siteData.whatsappNumber}).`
+        );
+      } else if (lower.includes("whatsapp") || lower.includes("pedir") || lower.includes("ordenar")) {
+        addBotMessage(
+          `¡Perfecto, ${chatState.userName}! Puedes agregar tus platos directamente en el menú de esta página (donde elegirás el sabor de tus refrescos gratis) o escribirnos directo al WhatsApp oficial **${siteData.whatsappNumber}** 📲.`
+        );
+      } else {
+        const found = siteData.menuItems.find(i => lower.includes(i.name.toLowerCase()));
+        if (found) {
+          addBotMessage(
+            `¡Excelente elección, ${chatState.userName}! 🍽️\n* **${found.name}** — RD$ ${found.price} (descuento aplicado)\n* ${found.includesText}\n\nPuedes agregarlo desde el menú para elegir tu refresco gratis.`
+          );
+        } else {
+          addBotMessage(
+            `${namePrefix}ese dato o producto no aparece en nuestro catálogo actual. Consultarémos con el equipo de operaciones de inmediato para confirmarte ✨.\n\nMientras tanto, puedes revisar nuestros **Desayunos y Cenas**, **Almuerzos** o **Extras** disponibles, o elegir recogida en el local.`
+          );
+        }
+      }
+
+      renderChatbot();
+    }
+
+    function renderChatbot() {
+      const msgContainer = document.getElementById("chatbot-messages");
+      const quickContainer = document.getElementById("chatbot-quick-replies");
+
+      msgContainer.innerHTML = chatState.messages.map(m => {
+        const formatted = m.text
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\n/g, "<br/>");
+        if (m.sender === "bot") {
+          return `
+            <div class="flex items-start gap-2">
+              <div class="w-7 h-7 rounded-full bg-brand-orange text-white flex items-center justify-center text-xs shrink-0 mt-0.5">🤖</div>
+              <div class="bg-white border border-orange-100 text-brand-dark rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-xs leading-relaxed shadow-xs max-w-[85%]">
+                ${formatted}
+              </div>
+            </div>
+          `;
+        }
+        return `
+          <div class="flex justify-end">
+            <div class="bg-brand-red text-white rounded-2xl rounded-tr-sm px-3.5 py-2.5 text-xs leading-relaxed shadow-xs max-w-[82%]">
+              ${formatted}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+
+      const quickOptions = chatState.awaitingName
+        ? ["María", "Carlos", "Ana"]
+        : [
+            "Desayunos y Cenas",
+            "Almuerzos",
+            "Extras y Bebidas",
+            "Sabores de Refresco",
+            "Cuentas Bancarias",
+            "Tarifas Delivery"
+          ];
+
+      quickContainer.innerHTML = quickOptions.map(opt => `
+        <button type="button" onclick="processUserChatMessage('${opt}')" class="shrink-0 px-3 py-1.5 rounded-full bg-orange-50 hover:bg-orange-100 text-brand-dark border border-orange-200 text-[11px] font-bold transition cursor-pointer">
+          ${opt}
+        </button>
+      `).join("");
+    }
+
+    // Acceso secreto y autenticación
+    function handleSecretLogoClick(event) {
+      secretLogoClickCount++;
+      clearTimeout(secretLogoClickTimer);
+      secretLogoClickTimer = setTimeout(() => {
+        secretLogoClickCount = 0;
+      }, 2000);
+
+      if (secretLogoClickCount >= 5) {
+        event.preventDefault();
+        secretLogoClickCount = 0;
+        triggerSecretAdminAccess("general");
+      }
+    }
+
+    function triggerSecretAdminAccess(targetTab = "general") {
+      pendingAdminTabAfterLogin = targetTab;
+      if (isAdminAuthenticated) {
+        openAdminModal(targetTab);
+      } else {
+        openAdminLoginModal();
+      }
+    }
+
+    function openAdminLoginModal() {
+      const modal = document.getElementById("admin-login-modal");
+      const input = document.getElementById("admin-password-input");
+      const errorEl = document.getElementById("admin-login-error");
+      const emailHint = document.getElementById("login-admin-email-hint");
+      const loginMsgEl = document.getElementById("login-email-status-msg");
+
+      if (emailHint) {
+        emailHint.textContent = `✉️ Correo registrado: ${siteData.adminEmail || "No configurado"}`;
+      }
+      if (loginMsgEl) {
+        loginMsgEl.classList.add("hidden");
+        loginMsgEl.textContent = "";
+      }
+
+      input.value = "";
+      errorEl.classList.add("hidden");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      setTimeout(() => input.focus(), 80);
+    }
+
+    function closeAdminLoginModal() {
+      const modal = document.getElementById("admin-login-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    async function handleAdminLogin(event) {
+      event.preventDefault();
+      const inputVal = document.getElementById("admin-password-input").value;
+      const errorEl = document.getElementById("admin-login-error");
+      const enteredDigest = await computeCredentialDigest(inputVal);
+      const storedHash = (siteData.adminPasswordHash || "").trim();
+
+      let isValid = false;
+      if (!storedHash) {
+        isValid = matchesInitialCredential(inputVal);
+        if (isValid) {
+          siteData.adminPasswordHash = enteredDigest;
+          saveSiteData();
+        }
+      } else if (enteredDigest === storedHash) {
+        isValid = true;
+      } else if (matchesInitialCredential(inputVal)) {
+        // Sincronizar digest si el usuario ingresa la credencial inicial y había un hash previo desactualizado
+        isValid = true;
+        siteData.adminPasswordHash = enteredDigest;
+        saveSiteData();
+      }
+
+      if (isValid) {
+        isAdminAuthenticated = true;
+        sessionStorage.setItem(ADMIN_SESSION_KEY, "true");
+        closeAdminLoginModal();
+        applyAdminSessionUI();
+        openAdminModal(pendingAdminTabAfterLogin);
+        showToast("Sesión de administrador iniciada correctamente.");
+      } else {
+        errorEl.classList.remove("hidden");
+        document.getElementById("admin-password-input").select();
+      }
+    }
+
+    function applyAdminSessionUI() {
+      const banner = document.getElementById("editor-banner");
+      const simBar = document.getElementById("bot-admin-sim-bar");
+      if (isAdminAuthenticated) {
+        banner.classList.remove("hidden");
+        if (simBar) {
+          simBar.classList.remove("hidden");
+          simBar.classList.add("flex");
+        }
+      } else {
+        banner.classList.add("hidden");
+        if (simBar) {
+          simBar.classList.add("hidden");
+          simBar.classList.remove("flex");
+        }
+        if (chatState.simulateOpen) {
+          chatState.simulateOpen = false;
+          updateStoreStatusUI();
+        }
+      }
+    }
+
+    function logoutAdmin() {
+      isAdminAuthenticated = false;
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      closeAdminModal();
+      applyAdminSessionUI();
+      if (window.location.search.includes("admin=true")) {
+        const cleanUrl = window.location.pathname + window.location.hash;
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
+      showToast("Sesión cerrada. Herramientas de edición ocultas.", "info");
+    }
+
+    function saveEmailSecuritySettings() {
+      if (!isAdminAuthenticated) return;
+      const emailVal = document.getElementById("edit-admin-email").value.trim();
+      const webhookVal = document.getElementById("edit-email-webhook").value.trim();
+
+      if (!emailVal || !emailVal.includes("@")) {
+        showToast("Ingresa un correo electrónico válido.", "error");
+        return;
+      }
+
+      siteData.adminEmail = emailVal;
+      siteData.emailWebhookUrl = webhookVal;
+      saveSiteData();
+      showToast("Correo de avisos de seguridad guardado.");
+    }
+
+    async function updateAdminPassword() {
+      if (!isAdminAuthenticated) return;
+      const p1 = document.getElementById("new-admin-password").value;
+      const p2 = document.getElementById("confirm-admin-password").value;
+
+      if (!p1 || p1.length < 6) {
+        showToast("La nueva contraseña debe tener al menos 6 caracteres.", "error");
+        return;
+      }
+      if (p1 !== p2) {
+        showToast("Las contraseñas no coinciden.", "error");
+        return;
+      }
+
+      siteData.adminPasswordHash = await computeCredentialDigest(p1);
+      saveSiteData();
+      document.getElementById("new-admin-password").value = "";
+      document.getElementById("confirm-admin-password").value = "";
+
+      await triggerSilentEmailAlert("password_changed");
+    }
+
+    // Panel de administración
+    function toggleEditMode(show) {
+      if (!isAdminAuthenticated && show) {
+        openAdminLoginModal();
+        return;
+      }
+      const banner = document.getElementById("editor-banner");
+      if (show) banner.classList.remove("hidden");
+      else banner.classList.add("hidden");
+    }
+
+    function openAdminModal(tab = "general") {
+      if (!isAdminAuthenticated) {
+        pendingAdminTabAfterLogin = tab;
+        openAdminLoginModal();
+        return;
+      }
+      toggleEditMode(true);
+      populateAdminForms();
+      switchAdminTab(tab);
+      const modal = document.getElementById("admin-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeAdminModal() {
+      const modal = document.getElementById("admin-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function switchAdminTab(tabName) {
+      document.querySelectorAll(".admin-panel").forEach(p => p.classList.add("hidden"));
+      document.querySelectorAll(".admin-tab-btn").forEach(b => {
+        b.className = "admin-tab-btn px-3.5 py-2 rounded-xl bg-white text-gray-700 hover:bg-gray-100 cursor-pointer";
+      });
+      document.getElementById(`admin-panel-${tabName}`).classList.remove("hidden");
+      document.getElementById(`admin-tab-${tabName}`).className = "admin-tab-btn px-3.5 py-2 rounded-xl bg-brand-orange text-white cursor-pointer";
+    }
+
+    function populateAdminForms() {
+      document.getElementById("edit-logo-emoji").value = siteData.logoEmoji || "🍔";
+      document.getElementById("edit-logo-url").value = (siteData.logoImageUrl || "").startsWith("data:") ? "" : (siteData.logoImageUrl || "");
+      document.getElementById("edit-business-name").value = siteData.businessName;
+      document.getElementById("edit-business-tagline").value = siteData.tagline;
+      document.getElementById("edit-hero-title").value = siteData.heroTitle;
+      document.getElementById("edit-hero-description").value = siteData.heroDescription;
+      document.getElementById("edit-hours-weekdays").value = siteData.hoursWeekdaysText;
+      document.getElementById("edit-hours-sunday").value = siteData.hoursSundayText;
+      document.getElementById("edit-delivery-day").value = siteData.deliveryDayPrice;
+      document.getElementById("edit-delivery-night").value = siteData.deliveryNightPrice;
+      document.getElementById("edit-pickup-address").value = siteData.pickupAddress;
+      document.getElementById("edit-soda-flavors").value = siteData.sodaFlavors.join(", ");
+
+      document.getElementById("edit-whatsapp-number").value = siteData.whatsappNumber;
+      document.getElementById("edit-payment-notice").value = siteData.paymentNotice;
+      document.getElementById("edit-payment-instructions").value = siteData.paymentInstructions;
+
+      document.getElementById("edit-admin-email").value = siteData.adminEmail || "";
+      document.getElementById("edit-email-webhook").value = siteData.emailWebhookUrl || "";
+
+      renderLogoUI();
+      renderAdminBanksList();
+      renderAdminMenuList();
+      renderAdminSectionsList();
+    }
+
+    function saveGeneralSettings() {
+      siteData.logoEmoji = document.getElementById("edit-logo-emoji").value.trim() || "🍔";
+      const urlVal = document.getElementById("edit-logo-url").value.trim();
+      if (urlVal) {
+        siteData.logoImageUrl = urlVal;
+      }
+      siteData.businessName = document.getElementById("edit-business-name").value.trim() || "GoDiegoGo Fast Food";
+      siteData.tagline = document.getElementById("edit-business-tagline").value.trim();
+      siteData.heroTitle = document.getElementById("edit-hero-title").value.trim();
+      siteData.heroDescription = document.getElementById("edit-hero-description").value.trim();
+      siteData.hoursWeekdaysText = document.getElementById("edit-hours-weekdays").value.trim();
+      siteData.hoursSundayText = document.getElementById("edit-hours-sunday").value.trim();
+      siteData.deliveryDayPrice = Number(document.getElementById("edit-delivery-day").value) || 50;
+      siteData.deliveryNightPrice = Number(document.getElementById("edit-delivery-night").value) || 75;
+      siteData.pickupAddress = document.getElementById("edit-pickup-address").value.trim();
+
+      const flavorsRaw = document.getElementById("edit-soda-flavors").value;
+      siteData.sodaFlavors = flavorsRaw.split(",").map(s => s.trim()).filter(Boolean);
+
+      saveSiteData();
+      showToast("Datos generales, logo y horarios guardados.");
+    }
+
+    function savePaymentAndWhatsappSettings() {
+      const cleanPhone = document.getElementById("edit-whatsapp-number").value.replace(/\D/g, "");
+      if (cleanPhone) siteData.whatsappNumber = cleanPhone;
+      siteData.paymentNotice = document.getElementById("edit-payment-notice").value.trim();
+      siteData.paymentInstructions = document.getElementById("edit-payment-instructions").value.trim();
+      saveSiteData();
+      showToast("WhatsApp y configuración de pagos actualizados.");
+    }
+
+    function renderAdminBanksList() {
+      const container = document.getElementById("admin-banks-list");
+      container.innerHTML = siteData.bankAccounts.map((acc, idx) => `
+        <div class="bg-gray-50 p-3.5 rounded-2xl border border-gray-200 grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
+          <input type="text" value="${acc.bankName}" onchange="updateBankField(${idx}, 'bankName', this.value)" placeholder="Banco" class="sm:col-span-4 px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs font-bold" />
+          <input type="text" value="${acc.accountNumber}" onchange="updateBankField(${idx}, 'accountNumber', this.value)" placeholder="Número de Cuenta" class="sm:col-span-4 px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs font-mono font-bold" />
+          <input type="text" value="${acc.holderName}" onchange="updateBankField(${idx}, 'holderName', this.value)" placeholder="Titular" class="sm:col-span-3 px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs" />
+          <button onclick="deleteBankAccount(${idx})" class="sm:col-span-1 text-red-600 hover:bg-red-100 p-2 rounded-xl text-xs font-bold cursor-pointer" title="Eliminar cuenta">🗑️</button>
+        </div>
+      `).join("");
+    }
+
+    function updateBankField(index, field, value) {
+      siteData.bankAccounts[index][field] = value.trim();
+      saveSiteData();
+      showToast("Cuenta bancaria actualizada.");
+    }
+
+    function addBankAccountPrompt() {
+      siteData.bankAccounts.push({
+        id: "bank-" + Date.now(),
+        bankName: "Nuevo Banco",
+        accountNumber: "0000000000",
+        accountType: "Cuenta Bancaria",
+        holderName: siteData.businessName
+      });
+      saveSiteData();
+      renderAdminBanksList();
+      showToast("Nueva fila de cuenta bancaria agregada. Edita sus datos.");
+    }
+
+    function deleteBankAccount(index) {
+      if (siteData.bankAccounts.length <= 1) {
+        showToast("Debe quedar al menos 1 cuenta bancaria activa.", "error");
+        return;
+      }
+      siteData.bankAccounts.splice(index, 1);
+      saveSiteData();
+      renderAdminBanksList();
+      showToast("Cuenta bancaria eliminada.");
+    }
+
+    function renderAdminMenuList() {
+      const catSelect = document.getElementById("new-item-category");
+      catSelect.innerHTML = siteData.categories.map(c =>
+        `<option value="${c.id}">${c.name}</option>`
+      ).join("");
+
+      const container = document.getElementById("admin-menu-items-list");
+      container.innerHTML = siteData.menuItems.map((item, idx) => `
+        <div class="bg-gray-50 p-3 rounded-2xl border border-gray-200 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center text-xs">
+          <input type="text" value="${item.emoji || '🍽️'}" onchange="updateMenuItemField(${idx}, 'emoji', this.value)" class="sm:col-span-1 px-2 py-1.5 rounded-lg border border-gray-300 bg-white text-center" />
+          <input type="text" value="${item.name}" onchange="updateMenuItemField(${idx}, 'name', this.value)" class="sm:col-span-4 px-2.5 py-1.5 rounded-lg border border-gray-300 bg-white font-bold" />
+          <div class="sm:col-span-2 flex items-center gap-1">
+            <span class="font-bold text-gray-500">RD$</span>
+            <input type="number" value="${item.price}" onchange="updateMenuItemField(${idx}, 'price', Number(this.value))" class="w-full px-2 py-1.5 rounded-lg border border-gray-300 bg-white font-bold" />
+          </div>
+          <select onchange="updateMenuItemField(${idx}, 'sodasIncluded', Number(this.value))" class="sm:col-span-2 px-2 py-1.5 rounded-lg border border-gray-300 bg-white">
+            <option value="0" ${item.sodasIncluded === 0 ? "selected" : ""}>0 refrescos</option>
+            <option value="1" ${item.sodasIncluded === 1 ? "selected" : ""}>1 refresco</option>
+            <option value="2" ${item.sodasIncluded === 2 ? "selected" : ""}>2 refrescos</option>
+          </select>
+          <input type="text" value="${item.includesText || ''}" onchange="updateMenuItemField(${idx}, 'includesText', this.value)" class="sm:col-span-2 px-2 py-1.5 rounded-lg border border-gray-300 bg-white" />
+          <button onclick="deleteMenuItem(${idx})" class="sm:col-span-1 text-red-600 hover:bg-red-100 p-1.5 rounded-lg font-bold cursor-pointer" title="Eliminar plato">🗑️</button>
+        </div>
+      `).join("");
+    }
+
+    function updateMenuItemField(index, field, value) {
+      siteData.menuItems[index][field] = value;
+      saveSiteData();
+      showToast("Plato actualizado.");
+    }
+
+    function addNewMenuItem() {
+      const name = document.getElementById("new-item-name").value.trim();
+      const price = Number(document.getElementById("new-item-price").value);
+      const categoryId = document.getElementById("new-item-category").value;
+      const sodasIncluded = Number(document.getElementById("new-item-sodas").value);
+      const includesText = document.getElementById("new-item-includes").value.trim();
+      const emoji = document.getElementById("new-item-emoji").value.trim() || "🍽️";
+
+      if (!name || !price || price <= 0) {
+        showToast("Escribe el nombre y un precio válido.", "error");
+        return;
+      }
+
+      siteData.menuItems.push({
+        id: "item-" + Date.now(),
+        categoryId,
+        name,
+        price,
+        sodasIncluded,
+        includesText: includesText || (sodasIncluded > 0 ? `Incluye ${sodasIncluded} refresco(s) gratis` : "Sin bebida incluida"),
+        emoji
+      });
+
+      document.getElementById("new-item-name").value = "";
+      document.getElementById("new-item-price").value = "";
+      document.getElementById("new-item-includes").value = "";
+
+      saveSiteData();
+      renderAdminMenuList();
+      showToast(`Plato "${name}" agregado al menú.`);
+    }
+
+    function deleteMenuItem(index) {
+      siteData.menuItems.splice(index, 1);
+      saveSiteData();
+      renderAdminMenuList();
+      showToast("Producto eliminado del menú.");
+    }
+
+    function renderAdminSectionsList() {
+      const container = document.getElementById("admin-sections-list");
+      container.innerHTML = siteData.customSections.map((sec, idx) => `
+        <div class="bg-gray-50 p-3.5 rounded-2xl border border-gray-200 space-y-2">
+          <div class="flex items-center gap-2">
+            <input type="text" value="${sec.icon}" onchange="updateSectionField(${idx}, 'icon', this.value)" class="w-12 px-2 py-1.5 rounded-lg border border-gray-300 bg-white text-center text-xs" />
+            <input type="text" value="${sec.title}" onchange="updateSectionField(${idx}, 'title', this.value)" class="flex-1 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-bold" />
+            <button onclick="deleteCustomSection(${idx})" class="text-red-600 hover:bg-red-100 px-2.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer">🗑️</button>
+          </div>
+          <textarea rows="2" onchange="updateSectionField(${idx}, 'content', this.value)" class="w-full px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs">${sec.content}</textarea>
+        </div>
+      `).join("");
+    }
+
+    function updateSectionField(index, field, value) {
+      siteData.customSections[index][field] = value;
+      saveSiteData();
+      showToast("Apartado actualizado.");
+    }
+
+    function addCustomSection() {
+      const icon = document.getElementById("new-sec-icon").value.trim() || "⭐";
+      const title = document.getElementById("new-sec-title").value.trim();
+      const content = document.getElementById("new-sec-content").value.trim();
+
+      if (!title || !content) {
+        showToast("Completa el título y contenido del apartado.", "error");
+        return;
+      }
+
+      siteData.customSections.push({
+        id: "sec-" + Date.now(),
+        icon,
+        title,
+        content
+      });
+
+      document.getElementById("new-sec-title").value = "";
+      document.getElementById("new-sec-content").value = "";
+      saveSiteData();
+      renderAdminSectionsList();
+      showToast("Nuevo apartado agregado.");
+    }
+
+    function deleteCustomSection(index) {
+      siteData.customSections.splice(index, 1);
+      saveSiteData();
+      renderAdminSectionsList();
+      showToast("Apartado eliminado.");
+    }
+
+    function exportUpdatedHTML() {
+      if (!isAdminAuthenticated) {
+        openAdminLoginModal();
+        return;
+      }
+      try {
+        const docClone = document.documentElement.cloneNode(true);
+        const toastEl = docClone.querySelector("#toast-container");
+        if (toastEl) toastEl.innerHTML = "";
+        const bannerEl = docClone.querySelector("#editor-banner");
+        if (bannerEl) bannerEl.classList.add("hidden");
+        const loginModalEl = docClone.querySelector("#admin-login-modal");
+        if (loginModalEl) {
+          loginModalEl.classList.add("hidden");
+          loginModalEl.classList.remove("flex");
+        }
+        const adminModalEl = docClone.querySelector("#admin-modal");
+        if (adminModalEl) {
+          adminModalEl.classList.add("hidden");
+          adminModalEl.classList.remove("flex");
+        }
+        const simBarEl = docClone.querySelector("#bot-admin-sim-bar");
+        if (simBarEl) {
+          simBarEl.classList.add("hidden");
+          simBarEl.classList.remove("flex");
+        }
+        const chatWinEl = docClone.querySelector("#chatbot-window");
+        if (chatWinEl) chatWinEl.classList.add("hidden");
+
+        let htmlString = "<!DOCTYPE html>\n" + docClone.outerHTML;
+        const serializedData = JSON.stringify(siteData, null, 2);
+        htmlString = htmlString.replace(
+          /\/\*__SITE_DATA_START__\*\/[\s\S]*?\/\*__SITE_DATA_END__\*\//,
+          `/*__SITE_DATA_START__*/${serializedData}/*__SITE_DATA_END__*/`
+        );
+
+        const blob = new Blob([htmlString], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "index.html";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast("Archivo index.html descargado con todos tus cambios.");
+      } catch (err) {
+        console.error(err);
+        showToast("Error al exportar el HTML.", "error");
+      }
+    }
+
+    function exportJSONBackup() {
+      const blob = new Blob([JSON.stringify(siteData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "godiegogo-configuracion.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("Respaldo JSON descargado.");
+    }
+
+    function importJSONBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && parsed.businessName && Array.isArray(parsed.menuItems)) {
+            delete parsed.initialPasswordSeed;
+            delete parsed.adminPhone;
+            siteData = parsed;
+            saveSiteData();
+            populateAdminForms();
+            showToast("Configuración importada correctamente.");
+          } else {
+            showToast("El archivo JSON no tiene el formato válido.", "error");
+          }
+        } catch (err) {
+          showToast("Error al leer el archivo JSON.", "error");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetToFactoryDefaults() {
+      if (!isAdminAuthenticated) return;
+      const currentHash = siteData.adminPasswordHash;
+      const currentEmail = siteData.adminEmail;
+      const currentWebhook = siteData.emailWebhookUrl;
+      localStorage.removeItem(STORAGE_KEY);
+      siteData = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA));
+      siteData.adminPasswordHash = currentHash;
+      siteData.adminEmail = currentEmail;
+      siteData.emailWebhookUrl = currentWebhook;
+      saveSiteData();
+      populateAdminForms();
+      showToast("Valores originales restaurados (se mantuvo tu contraseña y correo).");
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "e") {
+        e.preventDefault();
+        triggerSecretAdminAccess("general");
+      }
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderAll();
+      applyAdminSessionUI();
+      setInterval(updateStoreStatusUI, 60000);
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("admin") === "true") {
+        triggerSecretAdminAccess("general");
+      }
+    });
+  </script>
+</body>
+</html>
